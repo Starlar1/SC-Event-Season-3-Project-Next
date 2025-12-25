@@ -3215,7 +3215,7 @@ function shareToTelegram(task, index, button, card) {
     
     // Disable button temporarily
     button.disabled = true;
-    button.innerHTML = '<span class="share-btn-icon">⏳</span><span class="btn-text">စောင့်ပါ...</span>';
+    button.innerHTML = '<span class="btn-text">စောင့်ပါ...</span>';
     
     // Ask user to confirm after sharing
     setTimeout(() => {
@@ -3243,19 +3243,23 @@ function shareToTelegram(task, index, button, card) {
                 
                 // Mark as completed
                 button.disabled = true;
-                button.innerHTML = '<span class="share-btn-icon"></span><span class="btn-text">Completed</span>';
+                button.innerHTML = '<span class="btn-text">Completed</span>';
                 
                 // Save task data
                 saveTaskData();
             } else {
                 // Save task data for partial progress
                 saveTaskData();
+                
+                // Re-enable button for next share
+                button.disabled = false;
+                button.innerHTML = '<span class="btn-text">Share Now</span>';
             }
+        } else {
+            // User cancelled, re-enable button
+            button.disabled = false;
+            button.innerHTML = '<span class="btn-text">Share Now</span>';
         }
-        
-        // Re-enable button
-        button.disabled = false;
-        button.innerHTML = '<span class="share-btn-icon"></span><span class="btn-text">Share Now</span>';
         
     }, 3000); // 3 seconds delay for sharing
 }
