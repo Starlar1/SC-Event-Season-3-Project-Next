@@ -1,4 +1,4 @@
-<meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
 <html lang="en">
 <head>
     <!-- Supabase Client -->
@@ -2209,6 +2209,16 @@ const taskScreenHTML = `
             </button>
         </div>
         
+        <!-- NEW: Share Tasks Section -->
+        <div class="task-section share-task-section">
+            <h2 class="section-title">Share Tasks</h2>
+            <p class="task-subtitle">Telegram ကို Share ပြီး Token များရယူပါ</p>
+            
+            <div class="task-list" id="share-tasks">
+                <!-- Share tasks will be loaded here -->
+            </div>
+        </div>
+        
         <div class="task-section">
             <h2 class="section-title">Telegram Channel Tasks</h2>
             <p class="task-subtitle">Channel ဝင်ပြီး 5 Token ရယူပါ</p>
@@ -2620,6 +2630,153 @@ const taskScreenCSS = `
     cursor: not-allowed;
 }
 
+/* NEW: Share Tasks Section Styles */
+.share-task-section .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.share-task-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+}
+
+.share-task-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-shrink: 0;
+}
+
+.share-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(33, 150, 243, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+    padding: 5px;
+}
+
+.share-icon svg {
+    width: 30px;
+    height: 30px;
+    fill: #2196F3;
+}
+
+.share-task-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.share-task-name {
+    color: white;
+    font-size: 1.2rem;
+    margin: 0 0 5px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.share-task-reward {
+    color: #FFD700;
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.share-task-description {
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 20px 0;
+    font-size: 0.95rem;
+    flex: 1;
+}
+
+.share-task-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+}
+
+.share-progress-text {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.share-count {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.share-progress-bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.share-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2196F3, #0D47A1);
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 4px;
+}
+
+.share-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #2196F3, #0D47A1);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+    flex-shrink: 0;
+}
+
+.share-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #42A5F5, #1565C0);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(33, 150, 243, 0.5);
+}
+
+.share-btn:disabled {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.share-btn-icon {
+    font-size: 18px;
+}
+
 /* Mobile Responsive */
 @media (max-width: 600px) {
     .task-title {
@@ -2679,11 +2836,35 @@ const taskScreenCSS = `
         -webkit-line-clamp: 2;
         line-height: 1.3;
     }
+    
+    .share-task-card {
+        padding: 20px;
+        min-height: 180px;
+    }
+    
+    .share-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .share-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .share-task-name {
+        font-size: 1.1rem;
+    }
+    
+    .share-btn {
+        padding: 12px;
+        font-size: 0.95rem;
+    }
 }
 </style>
 `;
 
-// Task Data
+// Task Data (Updated with new share tasks)
 const tasksData = {
     telegramTasks: [
         { name: "Moonton Company MM", link: "https://t.me/MoontonCompamyMM", reward: 5 },
@@ -2697,6 +2878,25 @@ const tasksData = {
         { name: "Starlar YouTube", link: "https://youtube.com/@starlar.1", reward: 5 },
         { name: "Max Gaming Myanmar", link: "https://youtube.com/@maxgamingmyanmar1", reward: 5 },
         { name: "Monster Hunter Gaming", link: "https://youtube.com/@monsterhuntergaming668", reward: 5 }
+    ],
+    // NEW SHARE TASKS
+    shareTasks: [
+        { 
+            name: "5 ခါ Share ပါ", 
+            description: "Telegram ကို 5 ခါ Share ပြီး Token 5 ရယူမည်",
+            shareMessage: "MLBB Diamonds များကိုအခမဲ့ရယူလိုက်ပါ\nhttps://starlar1.github.io/SC-Event-Season-3-Project-Next/",
+            requiredCount: 5,
+            reward: 5,
+            completedCount: 0
+        },
+        { 
+            name: "10 ခါ Share ပါ", 
+            description: "Telegram ကို 10 ခါ Share ပြီး Token 8 ရယူမည်",
+            shareMessage: "MLBB Diamonds များကိုအခမဲ့ရယူလိုက်ပါ\nhttps://starlar1.github.io/SC-Event-Season-3-Project-Next/",
+            requiredCount: 10,
+            reward: 8,
+            completedCount: 0
+        }
     ]
 };
 
@@ -2731,6 +2931,7 @@ function initializeTaskSystem() {
     
     // Generate task lists
     generateTaskLists();
+    generateShareTasks(); // NEW: Generate share tasks
     
     // Start timer
     startTimer();
@@ -2752,6 +2953,15 @@ function loadTaskData() {
             task.completed = completedTasks.youtube.includes(task.link);
         });
         
+        // Load share tasks progress
+        const shareTasksProgress = data.shareTasksProgress || [];
+        tasksData.shareTasks.forEach((task, index) => {
+            const savedTask = shareTasksProgress.find(t => t.index === index);
+            if (savedTask) {
+                task.completedCount = savedTask.completedCount || 0;
+            }
+        });
+        
         // Load checking tasks
         const savedCheckingTasks = data.checkingTasks || [];
         savedCheckingTasks.forEach(taskId => {
@@ -2769,12 +2979,19 @@ function saveTaskData() {
         .filter(task => task.completed)
         .map(task => task.link);
     
+    // Save share tasks progress
+    const shareTasksProgress = tasksData.shareTasks.map((task, index) => ({
+        index: index,
+        completedCount: task.completedCount || 0
+    }));
+    
     const data = {
         lastClaimTime: lastClaimTime ? lastClaimTime.toISOString() : null,
         completedTasks: {
             telegram: completedTelegram,
             youtube: completedYoutube
         },
+        shareTasksProgress: shareTasksProgress,
         checkingTasks: Array.from(checkingTasks)
     };
     
@@ -2823,6 +3040,19 @@ function generateTaskLists() {
     });
 }
 
+// NEW: Generate share tasks list
+function generateShareTasks() {
+    const shareList = document.getElementById('share-tasks');
+    if (!shareList) return;
+    
+    shareList.innerHTML = '';
+    
+    tasksData.shareTasks.forEach((task, index) => {
+        const taskItem = createShareTaskItem(task, index);
+        shareList.appendChild(taskItem);
+    });
+}
+
 // Create task item element
 function createTaskItem(task, type, index) {
     const div = document.createElement('div');
@@ -2861,6 +3091,65 @@ function createTaskItem(task, type, index) {
     if (!task.completed) {
         joinBtn.addEventListener('click', function() {
             claimTaskReward(type, index, task, joinBtn);
+        });
+    }
+    
+    return div;
+}
+
+// NEW: Create share task item
+function createShareTaskItem(task, index) {
+    const div = document.createElement('div');
+    div.className = 'share-task-card';
+    div.dataset.index = index;
+    
+    // Load saved progress
+    const savedProgress = JSON.parse(localStorage.getItem(`shareTask_${index}`) || '{"completedCount":0}');
+    task.completedCount = savedProgress.completedCount || 0;
+    
+    const progressPercent = (task.completedCount / task.requiredCount) * 100;
+    const isCompleted = task.completedCount >= task.requiredCount;
+    
+    div.innerHTML = `
+        <div class="share-task-header">
+            <div class="share-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                </svg>
+            </div>
+            <div class="share-task-info">
+                <h3 class="share-task-name">${task.name}</h3>
+                <p class="share-task-reward">
+                    <img src="https://i.ibb.co/YTbp2Z70/Grid-Art-20251201-170338013.png" class="token-icon-tiny">
+                    <span>+${task.reward} Token</span>
+                </p>
+            </div>
+        </div>
+        
+        <p class="share-task-description">${task.description}</p>
+        
+        <div class="share-task-progress">
+            <div class="share-progress-text">
+                <span>Share ပြီးသည့်အရေအတွက်:</span>
+                <span class="share-count">${task.completedCount}/${task.requiredCount}</span>
+            </div>
+            <div class="share-progress-bar">
+                <div class="share-progress-fill" style="width: ${progressPercent}%"></div>
+            </div>
+        </div>
+        
+        <button class="share-btn" ${isCompleted ? 'disabled' : ''}>
+            <span class="share-btn-icon">📤</span>
+            <span class="btn-text">${isCompleted ? 'Completed' : 'Share Now'}</span>
+        </button>
+    `;
+    
+    // Add click event to button
+    const shareBtn = div.querySelector('.share-btn');
+    
+    if (!isCompleted) {
+        shareBtn.addEventListener('click', function() {
+            shareToTelegram(task, index, shareBtn, div);
         });
     }
     
@@ -2913,6 +3202,89 @@ function claimTaskReward(type, index, task, button) {
         // Show success message
         showTaskSuccessMessage(task.reward);
     }, 10000); // 10 seconds delay
+}
+
+// NEW: Share to Telegram function
+function shareToTelegram(task, index, button, card) {
+    // Create share URL
+    const shareText = encodeURIComponent(task.shareMessage);
+    const telegramShareURL = `https://t.me/share/url?url=&text=${shareText}`;
+    
+    // Open Telegram share dialog
+    window.open(telegramShareURL, '_blank', 'width=600,height=400');
+    
+    // Disable button temporarily
+    button.disabled = true;
+    button.innerHTML = '<span class="share-btn-icon">⏳</span><span class="btn-text">စောင့်ပါ...</span>';
+    
+    // Ask user to confirm after sharing
+    setTimeout(() => {
+        const confirmed = confirm(`ကျေးဇူးပြု၍ Share လုပ်ပြီးပါက "OK" ကိုနှိပ်ပါ။\n\nမှတ်ချက်: Share လုပ်ခဲ့သော Screenshot ကို သိမ်းဆည်းထားပါ။`);
+        
+        if (confirmed) {
+            // Increase share count
+            task.completedCount++;
+            
+            // Save progress
+            localStorage.setItem(`shareTask_${index}`, JSON.stringify({
+                completedCount: task.completedCount
+            }));
+            
+            // Update UI
+            updateShareTaskUI(task, index, card);
+            
+            // Check if task is completed
+            if (task.completedCount >= task.requiredCount) {
+                // Give reward
+                addTokens(task.reward);
+                
+                // Show success message
+                showTaskSuccessMessage(task.reward);
+                
+                // Mark as completed
+                button.disabled = true;
+                button.innerHTML = '<span class="share-btn-icon">✅</span><span class="btn-text">Completed</span>';
+                
+                // Save task data
+                saveTaskData();
+            } else {
+                // Save task data for partial progress
+                saveTaskData();
+            }
+        }
+        
+        // Re-enable button
+        button.disabled = false;
+        button.innerHTML = '<span class="share-btn-icon">📤</span><span class="btn-text">Share Now</span>';
+        
+    }, 3000); // 3 seconds delay for sharing
+}
+
+// NEW: Update share task UI
+function updateShareTaskUI(task, index, card) {
+    const progressPercent = (task.completedCount / task.requiredCount) * 100;
+    const isCompleted = task.completedCount >= task.requiredCount;
+    
+    // Update progress bar
+    const progressFill = card.querySelector('.share-progress-fill');
+    if (progressFill) {
+        progressFill.style.width = `${progressPercent}%`;
+    }
+    
+    // Update count
+    const countElement = card.querySelector('.share-count');
+    if (countElement) {
+        countElement.textContent = `${task.completedCount}/${task.requiredCount}`;
+    }
+    
+    // Update button if completed
+    if (isCompleted) {
+        const button = card.querySelector('.share-btn');
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = '<span class="share-btn-icon">✅</span><span class="btn-text">Completed</span>';
+        }
+    }
 }
 
 // Show success message
