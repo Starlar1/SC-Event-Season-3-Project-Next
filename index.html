@@ -2883,7 +2883,7 @@ const tasksData = {
     shareTasks: [
         { 
             name: "5 ခါ Share ပါ", 
-            description: "Telegram ကို 5 ခါ Share ပြီး Token 5 ရယူမည်",
+            description: "သူငယ်ချင်းများ ကို 5 ခါ Share ပါ",
             shareMessage: "MLBB Diamonds များကိုအခမဲ့ရယူလိုက်ပါ\nhttps://starlar1.github.io/SC-Event-Season-3-Project-Next/",
             requiredCount: 5,
             reward: 5,
@@ -2891,7 +2891,7 @@ const tasksData = {
         },
         { 
             name: "10 ခါ Share ပါ", 
-            description: "Telegram ကို 10 ခါ Share ပြီး Token 8 ရယူမည်",
+            description: "သူငယ်ချင်းများ ကို 10 ခါ Share ပါ",
             shareMessage: "MLBB Diamonds များကိုအခမဲ့ရယူလိုက်ပါ\nhttps://starlar1.github.io/SC-Event-Season-3-Project-Next/",
             requiredCount: 10,
             reward: 8,
@@ -3139,7 +3139,7 @@ function createShareTaskItem(task, index) {
         </div>
         
         <button class="share-btn" ${isCompleted ? 'disabled' : ''}>
-            <span class="share-btn-icon">📤</span>
+            <span class="share-btn-icon"></span>
             <span class="btn-text">${isCompleted ? 'Completed' : 'Share Now'}</span>
         </button>
     `;
@@ -3219,7 +3219,7 @@ function shareToTelegram(task, index, button, card) {
     
     // Ask user to confirm after sharing
     setTimeout(() => {
-        const confirmed = confirm(`ကျေးဇူးပြု၍ Share လုပ်ပြီးပါက "OK" ကိုနှိပ်ပါ။\n\nမှတ်ချက်: Share လုပ်ခဲ့သော Screenshot ကို သိမ်းဆည်းထားပါ။`);
+        const confirmed = confirm(`ကျေးဇူးပြု၍ Share လုပ်ပြီးပါက "OK" ကိုနှိပ်ပါ။\n\nမှတ်ချက်: အောင်မြင်စွာ Share လိုက်သည်`);
         
         if (confirmed) {
             // Increase share count
@@ -3243,7 +3243,7 @@ function shareToTelegram(task, index, button, card) {
                 
                 // Mark as completed
                 button.disabled = true;
-                button.innerHTML = '<span class="share-btn-icon">✅</span><span class="btn-text">Completed</span>';
+                button.innerHTML = '<span class="share-btn-icon"></span><span class="btn-text">Completed</span>';
                 
                 // Save task data
                 saveTaskData();
@@ -3255,7 +3255,7 @@ function shareToTelegram(task, index, button, card) {
         
         // Re-enable button
         button.disabled = false;
-        button.innerHTML = '<span class="share-btn-icon">📤</span><span class="btn-text">Share Now</span>';
+        button.innerHTML = '<span class="share-btn-icon"></span><span class="btn-text">Share Now</span>';
         
     }, 3000); // 3 seconds delay for sharing
 }
@@ -3282,7 +3282,7 @@ function updateShareTaskUI(task, index, card) {
         const button = card.querySelector('.share-btn');
         if (button) {
             button.disabled = true;
-            button.innerHTML = '<span class="share-btn-icon">✅</span><span class="btn-text">Completed</span>';
+            button.innerHTML = '<span class="share-btn-icon"></span><span class="btn-text">Completed</span>';
         }
     }
 }
