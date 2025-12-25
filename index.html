@@ -32,7 +32,7 @@ body{
 .background{
     width:100%;
     height:100%;
-    background:url("https://i.ibb.co/3nXmspD/In-Shot-20251201-103839768.jpg") center no-repeat;
+    background:url("https://i.ibb.co/LDvtZ5Fy/In-Shot-20251225-164135648.jpg") center no-repeat;
     background-size:cover;
     position:relative;
 }
@@ -747,7 +747,7 @@ body{
             </div>
 
             <div class="resource">
-                <img src="https://i.ibb.co/K1PkzXn/Grid-Art-20251201-165223815.png">
+                <img src="https://i.ibb.co/JWHLf84k/Grid-Art-20251225-163557125.png">
                 <span id="coin-count">0</span>
             </div>
         </div>
@@ -1006,9 +1006,9 @@ const coinsBoxHTML = `
         <!-- Result Popup -->
         <div class="coins-result-popup" id="coins-result-popup" style="display:none;">
             <div class="popup-content">
-                <div class="popup-title">ရရှိပါပြီ</div>
+                <div class="popup-title">ရရှိပါသည်</div>
                 <div class="popup-coins-display">
-                    <img src="https://i.ibb.co/K1PkzXn/Grid-Art-20251201-165223815.png" class="coins-icon">
+                    <img src="https://i.ibb.co/JWHLf84k/Grid-Art-20251225-163557125.png" class="coins-icon">
                     <div class="coins-amount">+<span id="popup-coins-gained">0</span></div>
                 </div>
                 <button class="popup-close-btn" id="popup-close-btn">OK</button>
@@ -1102,7 +1102,7 @@ const coinsBoxCSS = `
     position: absolute;
     width: 25px;
     height: 25px;
-    background: url("https://i.ibb.co/K1PkzXn/Grid-Art-20251201-165223815.png") center no-repeat;
+    background: url("https://i.ibb.co/JWHLf84k/Grid-Art-20251225-163557125.png") center no-repeat;
     background-size: contain;
     pointer-events: none;
     z-index: 5;
@@ -3715,7 +3715,7 @@ const exchangeFormModalHTML = `
 <div class="exchange-form-modal" id="exchange-form-modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3>Item လဲရန် အချက်အလက်များ</h3>
+            <h3>အချက်အလက်များထည့်ပါ</h3>
             <button class="modal-close-btn" id="modal-close-btn">&times;</button>
         </div>
         
@@ -3727,7 +3727,7 @@ const exchangeFormModalHTML = `
                 <div class="item-details">
                     <h4 id="selected-item-name"></h4>
                     <p class="item-cost-display">
-                        <img src="https://i.ibb.co/K1PkzXn/Grid-Art-20251201-165223815.png" class="cost-icon-small">
+                        <img src="https://i.ibb.co/JWHLf84k/Grid-Art-20251225-163557125.png" class="cost-icon-small">
                         <span id="selected-item-cost">0</span> Coins
                     </p>
                 </div>
@@ -3750,7 +3750,7 @@ const exchangeFormModalHTML = `
                 </div>
                 
                 <button type="submit" class="submit-exchange-btn" id="submit-exchange-btn">
-                    <span>📤 ပေးပို့မည်</span>
+                    <span>ပေးပို့မည်</span>
                 </button>
             </form>
         </div>
@@ -3766,31 +3766,31 @@ const TELEGRAM_GROUP_LINK = 'https://t.me/WinnerEvent';
 const exchangeItems = [
     {
         id: 1,
-        name: "5 Diamond",
+        name: "5 Diamond - 20 ယောက်သာလဲနိုင်",
         cost: 8000,
         image: "https://i.ibb.co/mMf2yyC/Grid-Art-20251216-173741174.jpg"
     },
     {
         id: 2,
-        name: "11 Diamond",
+        name: "11 Diamond - 2 ယောက်သာလဲနိုင်",
         cost: 15000,
         image: "https://i.ibb.co/J0Vh143/Grid-Art-20251216-173808269.jpg"
     },
     {
         id: 3,
-        name: "50 + 50 Diamond",
+        name: "50 + 50 - 1 ယောက်သာလဲနိုင်",
         cost: 50000,
         image: "https://i.ibb.co/4nxRRHSW/Grid-Art-20251216-173834490.jpg"
     },
     {
         id: 4,
-        name: "Wp Pass",
+        name: "Wp Pass - လဲမရသေးပါ",
         cost: 80000,
         image: "https://i.ibb.co/kgx7DRHy/Grid-Art-20251216-174338901.jpg"
     },
     {
         id: 5,
-        name: "Starlight",
+        name: "Starlight - 1 ‌ယောက်သာလဲနိုင်",
         cost: 100000,
         image: "https://i.ibb.co/qLYRGCWH/Grid-Art-20251225-105222747.jpg"
     }
@@ -3846,7 +3846,7 @@ function createExchangeItemCard(item) {
         <div class="exchange-item-details">
             <div class="exchange-item-name">${item.name}</div>
             <div class="exchange-item-cost">
-                <img src="https://i.ibb.co/K1PkzXn/Grid-Art-20251201-165223815.png" class="cost-icon">
+                <img src="https://i.ibb.co/JWHLf84k/Grid-Art-20251225-163557125.png" class="cost-icon">
                 <span>${item.cost.toLocaleString()} Coins</span>
             </div>
         </div>
@@ -4201,7 +4201,7 @@ Difference: -${item.cost.toLocaleString()}
             updateItemButtonStates();
             
             // Show success message
-            alert(`✅ Item Exchange Successful!\n\n${item.name} အတွက် ${item.cost.toLocaleString()} Coins ကုန်ကျပါသည်။\n\nTelegram Group တွင် သင့်အချက်အလက်များ ရောက်ရှိပါပြီ။\nကျေးဇူးပြု၍ စောင့်ဆိုင်းပေးပါ။`);
+            alert(`✅ Item Exchange Successful!\n\n${item.name} အတွက် ${item.cost.toLocaleString()} Coins ကုန်ကျပါသည်။\n\သင့်အချက်အလက်များ ရောက်ရှိပါပြီ။\nကျေးဇူးပြု၍ စောင့်ဆိုင်းပေးပါ။`);
             
             // Hide modal
             hideExchangeModal();
