@@ -1,4 +1,4 @@
-<meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
 <html lang="en">
 <head>
     <!-- Supabase Client -->
@@ -5632,6 +5632,1300 @@ document.addEventListener('DOMContentLoaded', () => {
         bgMusic.play().catch(() => {});
     }, { once: true });
 });
+
+
+// ===== PROFILE CIRCLE ON HOME SCREEN =====
+function addProfileCircleToHomeScreen() {
+    // Check if already exists
+    if (document.getElementById('home-profile-circle')) return;
+    
+    // Create profile circle container
+    const profileCircle = document.createElement('div');
+    profileCircle.id = 'home-profile-circle';
+    profileCircle.className = 'home-profile-circle';
+    
+    profileCircle.innerHTML = `
+        <div class="home-profile-inner">
+            <div class="home-profile-emoji" id="home-profile-emoji">👤</div>
+        </div>
+    `;
+    
+    // Add to game container (top-right corner)
+    const gameContainer = document.querySelector('.game-container');
+    if (gameContainer) {
+        gameContainer.style.position = 'relative';
+        gameContainer.appendChild(profileCircle);
+    }
+    
+    // Add CSS
+    const css = `
+        <style>
+        /* Home Profile Circle */
+        .home-profile-circle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 150, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            box-shadow: 
+                0 5px 15px rgba(0, 150, 255, 0.3),
+                inset 0 0 10px rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .home-profile-circle:hover {
+            transform: scale(1.1);
+            background: rgba(0, 150, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 
+                0 8px 20px rgba(0, 150, 255, 0.4),
+                inset 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+        
+        .home-profile-inner {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .home-profile-emoji {
+            font-size: 28px;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+        
+        .home-profile-circle:hover .home-profile-emoji {
+            transform: scale(1.2);
+        }
+        
+        /* Profile Modal */
+        .profile-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .profile-modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .profile-modal-content {
+            background: rgba(30, 30, 45, 0.95);
+            width: 320px;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 
+                0 25px 60px rgba(0, 0, 0, 0.6),
+                0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 30px rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            animation: modalSlideUp 0.4s ease;
+            position: relative;
+        }
+        
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        .profile-modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .profile-modal-title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 0 5px 0;
+            background: linear-gradient(45deg, #4dabf7, #339af0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .profile-modal-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+        }
+        
+        .profile-modal-picture {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .modal-profile-circle {
+            width: 100px;
+            height: 100px;
+            background: rgba(0, 150, 255, 0.15);
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .modal-profile-circle:hover {
+            transform: scale(1.05);
+            border-color: rgba(77, 171, 247, 0.5);
+        }
+        
+        .modal-emoji-display {
+            font-size: 50px;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-profile-circle:hover .modal-emoji-display {
+            transform: scale(1.1);
+        }
+        
+        .profile-upload-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .profile-info-section {
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 15px;
+            padding: 18px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-icon {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+        
+        .info-value {
+            color: white;
+            font-size: 13.5px;
+            font-weight: 500;
+        }
+        
+        .server-badge {
+            background: linear-gradient(135deg, #4dabf7, #339af0);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 3px 8px rgba(77, 171, 247, 0.3);
+        }
+        
+        .profile-modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .edit-profile-btn {
+            background: linear-gradient(135deg, #4dabf7, #339af0);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(77, 171, 247, 0.3);
+            letter-spacing: 0.3px;
+        }
+        
+        .edit-profile-btn:hover {
+            background: linear-gradient(135deg, #339af0, #228be6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(77, 171, 247, 0.4);
+        }
+        
+        .btn-icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 600px) {
+            .home-profile-circle {
+                top: 15px;
+                right: 15px;
+                width: 50px;
+                height: 50px;
+            }
+            
+            .home-profile-inner {
+                width: 42px;
+                height: 42px;
+            }
+            
+            .home-profile-emoji {
+                font-size: 24px;
+            }
+            
+            .profile-modal-content {
+                width: 90%;
+                padding: 25px 20px;
+            }
+            
+            .modal-profile-circle {
+                width: 90px;
+                height: 90px;
+            }
+            
+            .modal-emoji-display {
+                font-size: 45px;
+            }
+        }
+        </style>
+    `;
+    
+    document.head.insertAdjacentHTML('beforeend', css);
+    
+    // Add modal HTML if not exists
+    if (!document.getElementById('profile-modal')) {
+        const modalHTML = `
+            <div class="profile-modal" id="profile-modal">
+                <div class="profile-modal-content">
+                    <button class="modal-close-btn" id="profile-modal-close-btn">&times;</button>
+                    
+                    <div class="profile-modal-header">
+                        <h2 class="profile-modal-title">Profile</h2>
+                        <p class="profile-modal-subtitle">Your account information</p>
+                    </div>
+                    
+                    <div class="profile-modal-picture">
+                        <div class="modal-profile-circle" id="modal-profile-circle">
+                            <div class="modal-emoji-display" id="modal-emoji-display">👤</div>
+                        </div>
+                        <div class="profile-upload-label">Click to change picture</div>
+                    </div>
+                    
+                    <div class="profile-info-section">
+                        <div class="info-row">
+                            <div class="info-label">
+                                <svg class="info-icon" viewBox="0 0 24 24">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                </svg>
+                                <span>Name</span>
+                            </div>
+                            <div class="info-value" id="modal-user-name">Unknown</div>
+                        </div>
+                        
+                        <div class="info-row">
+                            <div class="info-label">
+                                <svg class="info-icon" viewBox="0 0 24 24">
+                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zM7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 2.88-2.88 7.19-5 9.88C9.92 16.21 7 11.85 7 9z"/>
+                                    <circle cx="12" cy="9" r="2.5"/>
+                                </svg>
+                                <span>User ID</span>
+                            </div>
+                            <div class="info-value" id="modal-user-id">N/A</div>
+                        </div>
+                        
+                        <div class="info-row">
+                            <div class="info-label">
+                                <svg class="info-icon" viewBox="0 0 24 24">
+                                    <path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/>
+                                </svg>
+                                <span>Server</span>
+                            </div>
+                            <div class="info-value">
+                                <span class="server-badge" id="modal-server-badge">Server 1</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-modal-actions">
+                        <button class="edit-profile-btn" id="edit-profile-btn">
+                            <svg class="btn-icon" viewBox="0 0 24 24">
+                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                            </svg>
+                            <span>Edit Profile</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+    
+    // Add hidden file inputs if not exist
+    if (!document.getElementById('modal-file-input')) {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.id = 'modal-file-input';
+        fileInput.accept = 'image/*';
+        fileInput.style.display = 'none';
+        document.body.appendChild(fileInput);
+    }
+    
+    // Event listeners
+    setupProfileModalEvents();
+    updateHomeProfile();
+}
+
+// Setup modal events
+function setupProfileModalEvents() {
+    const profileCircle = document.getElementById('home-profile-circle');
+    const modal = document.getElementById('profile-modal');
+    const closeBtn = document.getElementById('profile-modal-close-btn');
+    const modalProfileCircle = document.getElementById('modal-profile-circle');
+    const fileInput = document.getElementById('modal-file-input');
+    const editBtn = document.getElementById('edit-profile-btn');
+    
+    // Open modal when home profile circle is clicked
+    if (profileCircle) {
+        profileCircle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            showProfileModal();
+        });
+    }
+    
+    // Close modal
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            hideProfileModal();
+        });
+    }
+    
+    // Close modal when clicking outside
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                hideProfileModal();
+            }
+        });
+    }
+    
+    // Profile picture upload
+    if (modalProfileCircle && fileInput) {
+        modalProfileCircle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Image size too large (max 5MB)');
+                    return;
+                }
+                
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Please select JPEG, PNG, GIF, or WebP image');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    img.style.borderRadius = '50%';
+                    
+                    // Update modal display
+                    const modalEmoji = document.getElementById('modal-emoji-display');
+                    if (modalEmoji) {
+                        modalEmoji.innerHTML = '';
+                        modalEmoji.appendChild(img);
+                    }
+                    
+                    // Update home display
+                    const homeEmoji = document.getElementById('home-profile-emoji');
+                    if (homeEmoji) {
+                        const homeImg = document.createElement('img');
+                        homeImg.src = e.target.result;
+                        homeImg.style.width = '100%';
+                        homeImg.style.height = '100%';
+                        homeImg.style.objectFit = 'cover';
+                        homeImg.style.borderRadius = '50%';
+                        homeEmoji.innerHTML = '';
+                        homeEmoji.appendChild(homeImg);
+                    }
+                    
+                    // Save to local storage
+                    const userData = JSON.parse(localStorage.getItem('gameUserData') || '{}');
+                    userData.profileImage = e.target.result;
+                    localStorage.setItem('gameUserData', JSON.stringify(userData));
+                    
+                    // Sync to Server if possible
+                    syncProfileImageToServer(e.target.result);
+                    
+                    alert('Profile picture updated successfully!');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Edit profile button
+    if (editBtn) {
+        editBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            hideProfileModal();
+            showEditProfileScreen();
+        });
+    }
+}
+
+// Show profile modal
+function showProfileModal() {
+    const modal = document.getElementById('profile-modal');
+    if (!modal) return;
+    
+    // Load user data
+    const userData = JSON.parse(localStorage.getItem('gameUserData') || '{}');
+    
+    // Update modal content
+    const nameElement = document.getElementById('modal-user-name');
+    const idElement = document.getElementById('modal-user-id');
+    const serverElement = document.getElementById('modal-server-badge');
+    const modalEmoji = document.getElementById('modal-emoji-display');
+    const homeEmoji = document.getElementById('home-profile-emoji');
+    
+    if (nameElement) {
+        nameElement.textContent = userData.userName || 'Unknown';
+    }
+    
+    if (idElement) {
+        idElement.textContent = userData.userID || 'N/A';
+    }
+    
+    if (serverElement) {
+        const serverNum = userData.serverIndex !== undefined ? userData.serverIndex + 1 : 1;
+        serverElement.textContent = `Server ${serverNum}`;
+    }
+    
+    // Update profile image
+    if (userData.profileImage && modalEmoji) {
+        const img = document.createElement('img');
+        img.src = userData.profileImage;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '50%';
+        modalEmoji.innerHTML = '';
+        modalEmoji.appendChild(img);
+        
+        // Also update home profile
+        if (homeEmoji) {
+            const homeImg = document.createElement('img');
+            homeImg.src = userData.profileImage;
+            homeImg.style.width = '100%';
+            homeImg.style.height = '100%';
+            homeImg.style.objectFit = 'cover';
+            homeImg.style.borderRadius = '50%';
+            homeEmoji.innerHTML = '';
+            homeEmoji.appendChild(homeImg);
+        }
+    } else if (modalEmoji && !modalEmoji.querySelector('img')) {
+        modalEmoji.textContent = '👤';
+        if (homeEmoji) homeEmoji.textContent = '👤';
+    }
+    
+    modal.classList.add('show');
+}
+
+// Hide profile modal
+function hideProfileModal() {
+    const modal = document.getElementById('profile-modal');
+    if (modal) modal.classList.remove('show');
+}
+
+// Update home profile circle
+function updateHomeProfile() {
+    const userData = JSON.parse(localStorage.getItem('gameUserData') || '{}');
+    const homeEmoji = document.getElementById('home-profile-emoji');
+    
+    if (!homeEmoji) return;
+    
+    if (userData.profileImage) {
+        const img = document.createElement('img');
+        img.src = userData.profileImage;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '50%';
+        homeEmoji.innerHTML = '';
+        homeEmoji.appendChild(img);
+    } else {
+        homeEmoji.textContent = '👤';
+    }
+}
+
+// Sync profile image to Server
+async function syncProfileImageToServer(imageData) {
+    try {
+        const userData = JSON.parse(localStorage.getItem('gameUserData') || '{}');
+        if (!userData.userID) return;
+        
+        // Update on all servers
+        for (let i = 0; i < 4; i++) {
+            try {
+                const supabaseClient = getSupabaseClient(i);
+                const { error } = await supabaseClient
+                    .from('users')
+                    .update({ profile_image: imageData })
+                    .eq('user_id', userData.userID);
+                
+                if (!error) {
+                    console.log(`Profile image synced to server ${i + 1}`);
+                }
+            } catch (e) {
+                console.log(`Failed to sync to server ${i + 1}`);
+            }
+        }
+    } catch (error) {
+        console.error('Error syncing profile image:', error);
+    }
+}
+
+// ===== EDIT PROFILE SCREEN =====
+function showEditProfileScreen() {
+    // Remove existing edit screen if exists
+    const existingEditScreen = document.getElementById('edit-profile-screen');
+    if (existingEditScreen) {
+        existingEditScreen.remove();
+    }
+    
+    // Create edit profile screen
+    const editScreen = document.createElement('div');
+    editScreen.id = 'edit-profile-screen';
+    editScreen.className = 'edit-profile-screen';
+    
+    editScreen.innerHTML = `
+        <div class="edit-profile-background"></div>
+        
+        <div class="edit-profile-container">
+            <button class="edit-back-btn" id="edit-back-btn">
+                <svg viewBox="0 0 24 24" width="18" height="18">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/>
+                </svg>
+                Back
+            </button>
+            
+            <div class="edit-header">
+                <h2>Edit Profile</h2>
+                <p>Update your profile information</p>
+            </div>
+            
+            <div class="edit-form">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="edit-profile-picture">Profile Picture</label>
+                        <div class="picture-preview" id="edit-picture-preview">
+                            <div class="preview-circle" id="edit-preview-circle">
+                                <div id="edit-preview-emoji">👤</div>
+                            </div>
+                            <div class="picture-actions">
+                                <button class="upload-btn" id="edit-upload-btn">
+                                    <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+                                    </svg>
+                                    Upload New
+                                </button>
+                                <button class="remove-btn" id="edit-remove-btn">
+                                    <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/>
+                                    </svg>
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-user-name">Display Name</label>
+                        <input type="text" id="edit-user-name" placeholder="Enter your name" maxlength="20">
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button class="save-btn" id="edit-save-btn">
+                        <svg viewBox="0 0 24 24" width="18" height="18">
+                            <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" fill="currentColor"/>
+                        </svg>
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <input type="file" id="edit-file-input" accept="image/*" style="display:none;">
+    `;
+    
+    document.body.appendChild(editScreen);
+    
+    // Add CSS for edit screen
+    const editCSS = `
+        <style>
+        /* Edit Profile Screen */
+        .edit-profile-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1500;
+            display: block;
+        }
+        
+        .edit-profile-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        
+        .edit-profile-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .edit-back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 10;
+        }
+        
+        .edit-back-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .edit-header {
+            text-align: center;
+            margin: 60px 0 30px;
+        }
+        
+        .edit-header h2 {
+            color: white;
+            font-size: 28px;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, #4dabf7, #339af0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .edit-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+        
+        .edit-form {
+            max-width: 400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .form-section {
+            margin-bottom: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input[type="text"]:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #4dabf7;
+            box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.15);
+        }
+        
+        .picture-preview {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .preview-circle {
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 150, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .preview-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        
+        #edit-preview-emoji {
+            font-size: 40px;
+            line-height: 1;
+        }
+        
+        .picture-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .upload-btn, .remove-btn {
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .upload-btn {
+            background: rgba(77, 171, 247, 0.2);
+            color: #4dabf7;
+            border: 1px solid rgba(77, 171, 247, 0.3);
+        }
+        
+        .upload-btn:hover {
+            background: rgba(77, 171, 247, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .remove-btn {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+        
+        .remove-btn:hover {
+            background: rgba(255, 107, 107, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .form-actions {
+            margin-top: 25px;
+        }
+        
+        .save-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #4dabf7, #339af0);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(77, 171, 247, 0.3);
+        }
+        
+        .save-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #339af0, #228be6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(77, 171, 247, 0.4);
+        }
+        
+        .save-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 600px) {
+            .edit-profile-container {
+                padding: 15px;
+            }
+            
+            .edit-header {
+                margin: 50px 0 25px;
+            }
+            
+            .edit-header h2 {
+                font-size: 24px;
+            }
+            
+            .edit-form {
+                padding: 20px;
+            }
+            
+            .picture-preview {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
+            
+            .picture-actions {
+                width: 100%;
+                flex-direction: row;
+                justify-content: center;
+            }
+            
+            .upload-btn, .remove-btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+        </style>
+    `;
+    
+    document.head.insertAdjacentHTML('beforeend', editCSS);
+    
+    // Initialize edit screen
+    initializeEditScreen();
+}
+
+function initializeEditScreen() {
+    const editScreen = document.getElementById('edit-profile-screen');
+    const backBtn = document.getElementById('edit-back-btn');
+    const previewCircle = document.getElementById('edit-preview-circle');
+    const previewEmoji = document.getElementById('edit-preview-emoji');
+    const uploadBtn = document.getElementById('edit-upload-btn');
+    const removeBtn = document.getElementById('edit-remove-btn');
+    const nameInput = document.getElementById('edit-user-name');
+    const saveBtn = document.getElementById('edit-save-btn');
+    const fileInput = document.getElementById('edit-file-input');
+    
+    // Load current user data
+    const userData = JSON.parse(localStorage.getItem('gameUserData') || '{}');
+    
+    // Set current values
+    if (nameInput) {
+        nameInput.value = userData.userName || '';
+    }
+    
+    if (previewEmoji && userData.profileImage) {
+        const img = document.createElement('img');
+        img.src = userData.profileImage;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        previewEmoji.innerHTML = '';
+        previewEmoji.appendChild(img);
+    }
+    
+    // Back button
+    if (backBtn) {
+        backBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (editScreen) {
+                editScreen.remove();
+            }
+            showProfileModal();
+        });
+    }
+    
+    // Upload button
+    if (uploadBtn && fileInput) {
+        uploadBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            fileInput.click();
+        });
+    }
+    
+    // File input change
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Image size too large (max 5MB)');
+                    return;
+                }
+                
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Please select JPEG, PNG, GIF, or WebP image');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    
+                    if (previewEmoji) {
+                        previewEmoji.innerHTML = '';
+                        previewEmoji.appendChild(img);
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Remove button
+    if (removeBtn) {
+        removeBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (previewEmoji) {
+                previewEmoji.innerHTML = '👤';
+                previewEmoji.style.fontSize = '40px';
+                previewEmoji.style.lineHeight = '1';
+            }
+        });
+    }
+    
+    // Save button
+    if (saveBtn) {
+        saveBtn.addEventListener('click', async function(e) {
+            e.stopPropagation();
+            const newName = nameInput ? nameInput.value.trim() : '';
+            
+            if (!newName) {
+                alert('Please enter a display name');
+                return;
+            }
+            
+            // Disable save button
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = `
+                <svg viewBox="0 0 24 24" width="18" height="18">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
+                </svg>
+                Saving...
+            `;
+            
+            try {
+                // Get new profile image
+                let newImage = null;
+                const previewImg = previewCircle.querySelector('img');
+                if (previewImg) {
+                    newImage = previewImg.src;
+                } else if (previewEmoji.textContent !== '👤') {
+                    // If there was an image but now removed
+                    newImage = null;
+                }
+                
+                // Update local storage
+                userData.userName = newName;
+                userData.profileImage = newImage;
+                localStorage.setItem('gameUserData', JSON.stringify(userData));
+                
+                // Update Server
+                const updatePromises = [];
+                for (let i = 0; i < 4; i++) {
+                    try {
+                        const supabaseClient = getSupabaseClient(i);
+                        const updateData = { user_name: newName };
+                        if (newImage !== undefined) {
+                            updateData.profile_image = newImage;
+                        }
+                        
+                        updatePromises.push(
+                            supabaseClient
+                                .from('users')
+                                .update(updateData)
+                                .eq('user_id', userData.userID)
+                        );
+                    } catch (e) {
+                        console.log(`Server ${i + 1} update failed`);
+                    }
+                }
+                
+                await Promise.allSettled(updatePromises);
+                
+                // Update all displays
+                updateHomeProfile();
+                
+                // Update modal if exists
+                const modalName = document.getElementById('modal-user-name');
+                if (modalName) modalName.textContent = newName;
+                
+                // Update profile picture in modal
+                const modalEmoji = document.getElementById('modal-emoji-display');
+                if (modalEmoji) {
+                    if (newImage) {
+                        const img = document.createElement('img');
+                        img.src = newImage;
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '50%';
+                        modalEmoji.innerHTML = '';
+                        modalEmoji.appendChild(img);
+                    } else {
+                        modalEmoji.innerHTML = '👤';
+                        modalEmoji.style.fontSize = '50px';
+                    }
+                }
+                
+                alert('Profile updated successfully!');
+                
+                // Close edit screen and show profile modal
+                if (editScreen) {
+                    editScreen.remove();
+                }
+                showProfileModal();
+                
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                alert('Error updating profile. Please try again.');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="18" height="18">
+                        <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" fill="currentColor"/>
+                    </svg>
+                    Save Changes
+                `;
+            }
+        });
+    }
+}
+
+// ===== FIX ACCOUNT SCREEN BACK BUTTON =====
+function fixAccountScreenBackButton() {
+    // Wait for account creation screen to load
+    setTimeout(() => {
+        const accountScreen = document.getElementById('account-creation-screen');
+        if (accountScreen) {
+            // Add back button to account screen
+            const existingBackBtn = document.getElementById('account-screen-back-btn');
+            if (!existingBackBtn) {
+                const backBtn = document.createElement('button');
+                backBtn.id = 'account-screen-back-btn';
+                backBtn.className = 'account-screen-back-btn';
+                backBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="18" height="18">
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/>
+                    </svg>
+                    Back
+                `;
+                
+                // Add to account screen
+                accountScreen.appendChild(backBtn);
+                
+                // Add CSS for back button
+                const backBtnCSS = `
+                    <style>
+                    .account-screen-back-btn {
+                        position: absolute;
+                        top: 20px;
+                        left: 20px;
+                        background: rgba(255, 255, 255, 0.1);
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 20px;
+                        font-size: 14px;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        transition: all 0.3s ease;
+                        backdrop-filter: blur(10px);
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        z-index: 10001;
+                    }
+                    
+                    .account-screen-back-btn:hover {
+                        background: rgba(255, 255, 255, 0.15);
+                        transform: translateY(-2px);
+                    }
+                    </style>
+                `;
+                
+                document.head.insertAdjacentHTML('beforeend', backBtnCSS);
+                
+                // Add click event
+                backBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    accountScreen.style.display = 'none';
+                    document.getElementById('loading-screen').style.display = 'block';
+                });
+            }
+        }
+    }, 1000);
+}
+
+// ===== INITIALIZE WHEN GAME STARTS =====
+function initializeProfileSystem() {
+    // Wait for game container to be ready
+    const checkContainer = setInterval(() => {
+        const gameContainer = document.querySelector('.game-container');
+        if (gameContainer && gameContainer.style.display !== 'none') {
+            clearInterval(checkContainer);
+            addProfileCircleToHomeScreen();
+            updateHomeProfile();
+        }
+    }, 500);
+}
+
+// Start profile system when game loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Fix account screen back button
+    fixAccountScreenBackButton();
+    
+    // Start profile system
+    setTimeout(initializeProfileSystem, 1000);
+});
+
+// Also initialize when user enters game from loading screen
+const originalEnterBtn = document.getElementById('enter-btn');
+if (originalEnterBtn) {
+    const originalClick = originalEnterBtn.onclick;
+    originalEnterBtn.onclick = function() {
+        if (originalClick) originalClick();
+        setTimeout(() => {
+            initializeProfileSystem();
+            fixAccountScreenBackButton();
+        }, 100);
+    };
+}
+
+
+
+
 
 </script>
 </body>
