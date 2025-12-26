@@ -5635,9 +5635,330 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // ===== PROFILE CIRCLE ON HOME SCREEN =====
+// Store references to avoid duplication
+let profileCircleInitialized = false;
+let profileModalInitialized = false;
+
 function addProfileCircleToHomeScreen() {
-    // Check if already exists
-    if (document.getElementById('home-profile-circle')) return;
+    // Check if already exists and initialized
+    if (document.getElementById('home-profile-circle') || profileCircleInitialized) return;
+    profileCircleInitialized = true;
+    
+    // Add CSS only once
+    if (!document.getElementById('profile-circle-styles')) {
+        const css = `
+            <style id="profile-circle-styles">
+            /* Home Profile Circle */
+            .home-profile-circle {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                width: 60px;
+                height: 60px;
+                background: rgba(0, 150, 255, 0.2);
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 50;
+                box-shadow: 
+                    0 5px 15px rgba(0, 150, 255, 0.3),
+                    inset 0 0 10px rgba(255, 255, 255, 0.1);
+                transition: all 0.3s ease;
+                backdrop-filter: blur(5px);
+            }
+            
+            .home-profile-circle:hover {
+                transform: scale(1.1);
+                background: rgba(0, 150, 255, 0.3);
+                border-color: rgba(255, 255, 255, 0.5);
+                box-shadow: 
+                    0 8px 20px rgba(0, 150, 255, 0.4),
+                    inset 0 0 15px rgba(255, 255, 255, 0.2);
+            }
+            
+            .home-profile-inner {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .home-profile-emoji {
+                font-size: 28px;
+                line-height: 1;
+                transition: transform 0.3s ease;
+            }
+            
+            .home-profile-circle:hover .home-profile-emoji {
+                transform: scale(1.2);
+            }
+            
+            /* Profile Modal */
+            .profile-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.85);
+                z-index: 2000;
+                display: none;
+                justify-content: center;
+                align-items: center;
+                backdrop-filter: blur(10px);
+            }
+            
+            .profile-modal.show {
+                display: flex;
+                animation: fadeIn 0.3s ease;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            .profile-modal-content {
+                background: rgba(30, 30, 45, 0.95);
+                width: 320px;
+                border-radius: 25px;
+                padding: 30px;
+                box-shadow: 
+                    0 25px 60px rgba(0, 0, 0, 0.6),
+                    0 0 0 1px rgba(255, 255, 255, 0.1),
+                    inset 0 0 30px rgba(255, 255, 255, 0.05);
+                border: 2px solid rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(20px);
+                animation: modalSlideUp 0.4s ease;
+                position: relative;
+            }
+            
+            @keyframes modalSlideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(40px) scale(0.95);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
+            
+            .modal-close-btn {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                width: 30px;
+                height: 30px;
+                background: rgba(255, 255, 255, 0.1);
+                border: none;
+                border-radius: 50%;
+                color: white;
+                font-size: 18px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+                z-index: 10;
+            }
+            
+            .modal-close-btn:hover {
+                background: rgba(255, 255, 255, 0.2);
+                transform: rotate(90deg);
+            }
+            
+            .profile-modal-header {
+                text-align: center;
+                margin-bottom: 25px;
+            }
+            
+            .profile-modal-title {
+                color: white;
+                font-size: 24px;
+                font-weight: bold;
+                margin: 0 0 5px 0;
+                background: linear-gradient(45deg, #4dabf7, #339af0);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            
+            .profile-modal-subtitle {
+                color: rgba(255, 255, 255, 0.6);
+                font-size: 13px;
+            }
+            
+            .profile-modal-picture {
+                text-align: center;
+                margin-bottom: 25px;
+            }
+            
+            .modal-profile-circle {
+                width: 100px;
+                height: 100px;
+                background: rgba(0, 150, 255, 0.15);
+                border-radius: 50%;
+                margin: 0 auto 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 3px solid rgba(255, 255, 255, 0.2);
+                overflow: hidden;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+            
+            .modal-profile-circle:hover {
+                transform: scale(1.05);
+                border-color: rgba(77, 171, 247, 0.5);
+            }
+            
+            .modal-emoji-display {
+                font-size: 50px;
+                line-height: 1;
+                transition: transform 0.3s ease;
+            }
+            
+            .modal-profile-circle:hover .modal-emoji-display {
+                transform: scale(1.1);
+            }
+            
+            .profile-upload-label {
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 12px;
+                cursor: pointer;
+            }
+            
+            .profile-info-section {
+                background: rgba(255, 255, 255, 0.07);
+                border-radius: 15px;
+                padding: 18px;
+                margin-bottom: 20px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .info-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            
+            .info-row:last-child {
+                border-bottom: none;
+            }
+            
+            .info-label {
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 13px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .info-icon {
+                width: 14px;
+                height: 14px;
+                fill: currentColor;
+            }
+            
+            .info-value {
+                color: white;
+                font-size: 13.5px;
+                font-weight: 500;
+            }
+            
+            .server-badge {
+                background: linear-gradient(135deg, #4dabf7, #339af0);
+                color: white;
+                padding: 4px 12px;
+                border-radius: 12px;
+                font-size: 12px;
+                font-weight: 600;
+                box-shadow: 0 3px 8px rgba(77, 171, 247, 0.3);
+            }
+            
+            .profile-modal-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .edit-profile-btn {
+                background: linear-gradient(135deg, #4dabf7, #339af0);
+                color: white;
+                border: none;
+                padding: 14px;
+                border-radius: 12px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(77, 171, 247, 0.3);
+                letter-spacing: 0.3px;
+            }
+            
+            .edit-profile-btn:hover {
+                background: linear-gradient(135deg, #339af0, #228be6);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(77, 171, 247, 0.4);
+            }
+            
+            .btn-icon {
+                width: 16px;
+                height: 16px;
+                fill: currentColor;
+            }
+            
+            /* Mobile responsive */
+            @media (max-width: 600px) {
+                .home-profile-circle {
+                    top: 15px;
+                    right: 15px;
+                    width: 50px;
+                    height: 50px;
+                }
+                
+                .home-profile-inner {
+                    width: 42px;
+                    height: 42px;
+                }
+                
+                .home-profile-emoji {
+                    font-size: 24px;
+                }
+                
+                .profile-modal-content {
+                    width: 90%;
+                    padding: 25px 20px;
+                }
+                
+                .modal-profile-circle {
+                    width: 90px;
+                    height: 90px;
+                }
+                
+                .modal-emoji-display {
+                    font-size: 45px;
+                }
+            }
+            </style>
+        `;
+        
+        document.head.insertAdjacentHTML('beforeend', css);
+    }
     
     // Create profile circle container
     const profileCircle = document.createElement('div');
@@ -5656,320 +5977,6 @@ function addProfileCircleToHomeScreen() {
         gameContainer.style.position = 'relative';
         gameContainer.appendChild(profileCircle);
     }
-    
-    // Add CSS
-    const css = `
-        <style>
-        /* Home Profile Circle */
-        .home-profile-circle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background: rgba(0, 150, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
-            box-shadow: 
-                0 5px 15px rgba(0, 150, 255, 0.3),
-                inset 0 0 10px rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-        
-        .home-profile-circle:hover {
-            transform: scale(1.1);
-            background: rgba(0, 150, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
-            box-shadow: 
-                0 8px 20px rgba(0, 150, 255, 0.4),
-                inset 0 0 15px rgba(255, 255, 255, 0.2);
-        }
-        
-        .home-profile-inner {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .home-profile-emoji {
-            font-size: 28px;
-            line-height: 1;
-            transition: transform 0.3s ease;
-        }
-        
-        .home-profile-circle:hover .home-profile-emoji {
-            transform: scale(1.2);
-        }
-        
-        /* Profile Modal */
-        .profile-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 2000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(10px);
-        }
-        
-        .profile-modal.show {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .profile-modal-content {
-            background: rgba(30, 30, 45, 0.95);
-            width: 320px;
-            border-radius: 25px;
-            padding: 30px;
-            box-shadow: 
-                0 25px 60px rgba(0, 0, 0, 0.6),
-                0 0 0 1px rgba(255, 255, 255, 0.1),
-                inset 0 0 30px rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            animation: modalSlideUp 0.4s ease;
-            position: relative;
-        }
-        
-        @keyframes modalSlideUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-        
-        .modal-close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 30px;
-            height: 30px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 50%;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            z-index: 10;
-        }
-        
-        .modal-close-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: rotate(90deg);
-        }
-        
-        .profile-modal-header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        
-        .profile-modal-title {
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-            margin: 0 0 5px 0;
-            background: linear-gradient(45deg, #4dabf7, #339af0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .profile-modal-subtitle {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 13px;
-        }
-        
-        .profile-modal-picture {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        
-        .modal-profile-circle {
-            width: 100px;
-            height: 100px;
-            background: rgba(0, 150, 255, 0.15);
-            border-radius: 50%;
-            margin: 0 auto 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 3px solid rgba(255, 255, 255, 0.2);
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .modal-profile-circle:hover {
-            transform: scale(1.05);
-            border-color: rgba(77, 171, 247, 0.5);
-        }
-        
-        .modal-emoji-display {
-            font-size: 50px;
-            line-height: 1;
-            transition: transform 0.3s ease;
-        }
-        
-        .modal-profile-circle:hover .modal-emoji-display {
-            transform: scale(1.1);
-        }
-        
-        .profile-upload-label {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
-            cursor: pointer;
-        }
-        
-        .profile-info-section {
-            background: rgba(255, 255, 255, 0.07);
-            border-radius: 15px;
-            padding: 18px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        
-        .info-row:last-child {
-            border-bottom: none;
-        }
-        
-        .info-label {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .info-icon {
-            width: 14px;
-            height: 14px;
-            fill: currentColor;
-        }
-        
-        .info-value {
-            color: white;
-            font-size: 13.5px;
-            font-weight: 500;
-        }
-        
-        .server-badge {
-            background: linear-gradient(135deg, #4dabf7, #339af0);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            box-shadow: 0 3px 8px rgba(77, 171, 247, 0.3);
-        }
-        
-        .profile-modal-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .edit-profile-btn {
-            background: linear-gradient(135deg, #4dabf7, #339af0);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(77, 171, 247, 0.3);
-            letter-spacing: 0.3px;
-        }
-        
-        .edit-profile-btn:hover {
-            background: linear-gradient(135deg, #339af0, #228be6);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(77, 171, 247, 0.4);
-        }
-        
-        .btn-icon {
-            width: 16px;
-            height: 16px;
-            fill: currentColor;
-        }
-        
-        /* Mobile responsive */
-        @media (max-width: 600px) {
-            .home-profile-circle {
-                top: 15px;
-                right: 15px;
-                width: 50px;
-                height: 50px;
-            }
-            
-            .home-profile-inner {
-                width: 42px;
-                height: 42px;
-            }
-            
-            .home-profile-emoji {
-                font-size: 24px;
-            }
-            
-            .profile-modal-content {
-                width: 90%;
-                padding: 25px 20px;
-            }
-            
-            .modal-profile-circle {
-                width: 90px;
-                height: 90px;
-            }
-            
-            .modal-emoji-display {
-                font-size: 45px;
-            }
-        }
-        </style>
-    `;
-    
-    document.head.insertAdjacentHTML('beforeend', css);
     
     // Add modal HTML if not exists
     if (!document.getElementById('profile-modal')) {
@@ -6057,6 +6064,9 @@ function addProfileCircleToHomeScreen() {
 
 // Setup modal events
 function setupProfileModalEvents() {
+    if (profileModalInitialized) return;
+    profileModalInitialized = true;
+    
     const profileCircle = document.getElementById('home-profile-circle');
     const modal = document.getElementById('profile-modal');
     const closeBtn = document.getElementById('profile-modal-close-btn');
@@ -6355,7 +6365,7 @@ function showEditProfileScreen() {
     
     // Add CSS for edit screen
     const editCSS = `
-        <style>
+        <style id="edit-profile-styles">
         /* Edit Profile Screen */
         .edit-profile-screen {
             position: fixed;
@@ -6614,7 +6624,9 @@ function showEditProfileScreen() {
         </style>
     `;
     
-    document.head.insertAdjacentHTML('beforeend', editCSS);
+    if (!document.getElementById('edit-profile-styles')) {
+        document.head.insertAdjacentHTML('beforeend', editCSS);
+    }
     
     // Initialize edit screen
     initializeEditScreen();
@@ -6823,71 +6835,6 @@ function initializeEditScreen() {
     }
 }
 
-// ===== FIX ACCOUNT SCREEN BACK BUTTON =====
-function fixAccountScreenBackButton() {
-    // Wait for account creation screen to load
-    setTimeout(() => {
-        const accountScreen = document.getElementById('account-creation-screen');
-        if (accountScreen) {
-            // Add back button to account screen
-            const existingBackBtn = document.getElementById('account-screen-back-btn');
-            if (!existingBackBtn) {
-                const backBtn = document.createElement('button');
-                backBtn.id = 'account-screen-back-btn';
-                backBtn.className = 'account-screen-back-btn';
-                backBtn.innerHTML = `
-                    <svg viewBox="0 0 24 24" width="18" height="18">
-                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/>
-                    </svg>
-                    Back
-                `;
-                
-                // Add to account screen
-                accountScreen.appendChild(backBtn);
-                
-                // Add CSS for back button
-                const backBtnCSS = `
-                    <style>
-                    .account-screen-back-btn {
-                        position: absolute;
-                        top: 20px;
-                        left: 20px;
-                        background: rgba(255, 255, 255, 0.1);
-                        color: white;
-                        border: none;
-                        padding: 10px 20px;
-                        border-radius: 20px;
-                        font-size: 14px;
-                        cursor: pointer;
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                        transition: all 0.3s ease;
-                        backdrop-filter: blur(10px);
-                        border: 1px solid rgba(255, 255, 255, 0.1);
-                        z-index: 10001;
-                    }
-                    
-                    .account-screen-back-btn:hover {
-                        background: rgba(255, 255, 255, 0.15);
-                        transform: translateY(-2px);
-                    }
-                    </style>
-                `;
-                
-                document.head.insertAdjacentHTML('beforeend', backBtnCSS);
-                
-                // Add click event
-                backBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    accountScreen.style.display = 'none';
-                    document.getElementById('loading-screen').style.display = 'block';
-                });
-            }
-        }
-    }, 1000);
-}
-
 // ===== INITIALIZE WHEN GAME STARTS =====
 function initializeProfileSystem() {
     // Wait for game container to be ready
@@ -6903,9 +6850,6 @@ function initializeProfileSystem() {
 
 // Start profile system when game loads
 document.addEventListener('DOMContentLoaded', function() {
-    // Fix account screen back button
-    fixAccountScreenBackButton();
-    
     // Start profile system
     setTimeout(initializeProfileSystem, 1000);
 });
@@ -6918,14 +6862,825 @@ if (originalEnterBtn) {
         if (originalClick) originalClick();
         setTimeout(() => {
             initializeProfileSystem();
-            fixAccountScreenBackButton();
         }, 100);
     };
 }
 
+// ===== RANK SYSTEM - CLEAN FINAL VERSION =====
 
+// Rank Screen HTML
+const rankScreenHTML = `
+<div class="rank-screen" id="rank-screen" style="display:none;">
+    <div class="rank-background"></div>
+    
+    <div class="rank-content">
+        <!-- Back Button -->
+        <button class="rank-back-btn" id="rank-back-btn">
+            <svg class="back-icon" viewBox="0 0 24 24">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+            </svg>
+            Back
+        </button>
+        
+        <!-- Server Selection -->
+        <div class="server-selection" id="server-selection">
+            <h2 class="section-title">Server ရွေးပါ</h2>
+            
+            <div class="server-grid">
+                <div class="server-card" data-server="0">
+                    <div class="server-info">
+                        <h3 class="server-name">Server 1</h3>
+                    </div>
+                </div>
+                
+                <div class="server-card" data-server="1">
+                    <div class="server-info">
+                        <h3 class="server-name">Server 2</h3>
+                    </div>
+                </div>
+                
+                <div class="server-card" data-server="2">
+                    <div class="server-info">
+                        <h3 class="server-name">Server 3</h3>
+                    </div>
+                </div>
+                
+                <div class="server-card" data-server="3">
+                    <div class="server-info">
+                        <h3 class="server-name">Server 4</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rank View -->
+        <div class="rank-view" id="rank-view" style="display:none;">
+            <!-- Rank Title -->
+            <h2 class="rank-main-title">Rank</h2>
+            
+            <!-- Rank Tabs -->
+            <div class="rank-tabs-row">
+                <button class="rank-tab active" data-type="coins">
+                    Coins Rank
+                </button>
+                <button class="rank-tab" data-type="tokens">
+                    Token Rank
+                </button>
+            </div>
+            
+            <!-- Current Server -->
+            <div class="current-server-info">
+                <span class="server-name-display" id="current-server-name">Server 1</span>
+            </div>
+            
+            <!-- Loading -->
+            <div class="rank-loading" id="rank-loading">
+                <div class="loader"></div>
+                <p>Loading...</p>
+            </div>
+            
+            <!-- Rank List -->
+            <div class="rank-list-container" id="rank-list-container">
+                <div class="rank-list" id="rank-list">
+                    <!-- Rank items will appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+<style>
+/* Rank Screen Styles */
+.rank-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+    display: none;
+}
 
+.rank-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url("https://i.ibb.co/45KxnTJ/dfecf763c9e153c157591b31002ec252-1.jpg") center no-repeat;
+    background-size: cover;
+    filter: brightness(0.7);
+}
+
+.rank-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    padding-top: 70px;
+    overflow-y: auto;
+}
+
+/* Back Button */
+.rank-back-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: #2196F3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.back-icon {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+/* Server Selection */
+.server-selection {
+    max-width: 400px;
+    margin: 0 auto;
+    padding-top: 50px;
+}
+
+.section-title {
+    color: white;
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 25px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.server-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* Server Card - Brighter Blue */
+.server-card {
+    background: #2196F3;
+    border-radius: 12px;
+    padding: 15px;
+    cursor: pointer;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    transition: all 0.3s ease;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+}
+
+.server-card:hover {
+    background: #1976D2;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(33, 150, 243, 0.5);
+}
+
+.server-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.server-name {
+    color: white;
+    font-size: 16px;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Rank View */
+.rank-view {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Rank Title */
+.rank-main-title {
+    color: white;
+    text-align: center;
+    font-size: 32px;
+    margin: 0 0 20px 0;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+/* Rank Tabs - Brighter Blue */
+.rank-tabs-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.rank-tab {
+    flex: 1;
+    padding: 12px;
+    background: #2196F3;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+}
+
+.rank-tab.active {
+    background: #1976D2;
+    box-shadow: 0 0 15px rgba(33, 150, 243, 0.7);
+}
+
+.rank-tab:hover:not(.active) {
+    background: #1976D2;
+    box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+}
+
+/* Current Server */
+.current-server-info {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.server-name-display {
+    background: #2196F3;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 15px;
+    font-size: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+}
+
+/* Loading */
+.rank-loading {
+    text-align: center;
+    padding: 30px;
+    display: none;
+}
+
+.loader {
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top: 3px solid #2196F3;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.rank-loading p {
+    color: white;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Rank List Container */
+.rank-list-container {
+    background: rgba(33, 150, 243, 0.25);
+    border-radius: 15px;
+    padding: 15px;
+    border: 2px solid rgba(33, 150, 243, 0.5);
+    min-height: 400px;
+    max-height: 500px;
+    overflow-y: auto;
+    box-shadow: 0 5px 15px rgba(33, 150, 243, 0.2);
+    display: none;
+}
+
+/* Rank List */
+.rank-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Rank Item - Brighter Blue Background */
+.rank-item {
+    background: #2196F3;
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: slideIn 0.5s ease forwards;
+}
+
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.rank-item.current-user {
+    background: #1976D2;
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 20px rgba(33, 150, 243, 0.7);
+}
+
+/* Position Text - Just text, no circle */
+.rank-position {
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    flex-shrink: 0;
+    min-width: 35px;
+    text-align: center;
+}
+
+.rank-item.top-1 .rank-position {
+    color: gold;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.rank-item.top-2 .rank-position {
+    color: silver;
+    text-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
+}
+
+.rank-item.top-3 .rank-position {
+    color: #FFB74D;
+    text-shadow: 0 0 10px rgba(255, 183, 77, 0.5);
+}
+
+/* Profile Circle */
+.rank-profile {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.rank-profile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.rank-emoji {
+    font-size: 28px;
+}
+
+/* Rank Info */
+.rank-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.rank-name {
+    color: white;
+    font-size: 16px;
+    margin: 0 0 5px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.rank-score-display {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.score-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+}
+
+.score-amount {
+    color: #FFD700;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* Scrollbar */
+.rank-list-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.rank-list-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.rank-list-container::-webkit-scrollbar-thumb {
+    background: rgba(33, 150, 243, 0.6);
+    border-radius: 4px;
+}
+
+.rank-list-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(33, 150, 243, 0.8);
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .server-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .rank-content {
+        padding: 15px;
+        padding-top: 60px;
+    }
+    
+    .rank-main-title {
+        font-size: 26px;
+    }
+    
+    .rank-tab {
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    .rank-item {
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .rank-profile {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .rank-name {
+        font-size: 14px;
+    }
+}
+</style>
+`;
+
+// Insert HTML
+document.body.insertAdjacentHTML('beforeend', rankScreenHTML);
+
+// Rank System Variables
+let rankScreen, rankBackBtn, serverSelection, rankView;
+let serverCards, rankTabs, currentServerName, rankLoading, rankListContainer, rankList;
+let currentServerIndex = 0;
+let currentRankType = 'coins';
+let isFetching = false;
+let currentUserData = {};
+
+// Image URLs
+const COIN_ICON = "https://i.ibb.co/JWHLf84k/Grid-Art-20251225-163557125.png";
+const TOKEN_ICON = "https://i.ibb.co/YTbp2Z70/Grid-Art-20251201-170338013.png";
+
+function initializeRankSystem() {
+    // Get elements
+    rankScreen = document.getElementById('rank-screen');
+    rankBackBtn = document.getElementById('rank-back-btn');
+    serverSelection = document.getElementById('server-selection');
+    rankView = document.getElementById('rank-view');
+    currentServerName = document.getElementById('current-server-name');
+    rankLoading = document.getElementById('rank-loading');
+    rankListContainer = document.getElementById('rank-list-container');
+    rankList = document.getElementById('rank-list');
+    
+    // Get current user data
+    currentUserData = JSON.parse(localStorage.getItem('gameUserData') || '{}');
+    
+    // Server cards
+    serverCards = document.querySelectorAll('.server-card');
+    serverCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const serverIndex = parseInt(this.dataset.server);
+            selectServer(serverIndex);
+        });
+    });
+    
+    // Rank tabs
+    rankTabs = document.querySelectorAll('.rank-tab');
+    rankTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const type = this.dataset.type;
+            switchRankTab(type);
+        });
+    });
+    
+    // Add Rank button to sidebar
+    addRankButtonToSidebar();
+    
+    // Event listeners
+    rankBackBtn.addEventListener('click', hideRankScreen);
+}
+
+function addRankButtonToSidebar() {
+    const rankBtn = document.createElement('button');
+    rankBtn.className = 'sidebar-btn';
+    rankBtn.id = 'rank-btn';
+    rankBtn.innerHTML = '<span>Rank ကြည့်မည်</span>';
+    
+    const sidebarButtons = document.getElementById('sidebar-buttons');
+    if (sidebarButtons) {
+        sidebarButtons.appendChild(rankBtn);
+        rankBtn.addEventListener('click', showRankScreen);
+    }
+}
+
+function showRankScreen() {
+    document.getElementById('game-container').style.display = 'none';
+    rankScreen.style.display = 'block';
+    serverSelection.style.display = 'block';
+    rankView.style.display = 'none';
+    
+    // Stop any ongoing fetching
+    if (isFetching) {
+        isFetching = false;
+    }
+    
+    resetRankData();
+}
+
+function hideRankScreen() {
+    // Stop any ongoing fetching
+    if (isFetching) {
+        isFetching = false;
+    }
+    
+    rankScreen.style.display = 'none';
+    document.getElementById('game-container').style.display = 'block';
+}
+
+function selectServer(serverIndex) {
+    console.log('✅ Select Server:', serverIndex);
+    
+    // OLD DATA အကုန်ဖြတ်
+    resetRankData();
+    
+    currentServerIndex = serverIndex;
+    currentServerName.textContent = `Server ${serverIndex + 1}`;
+    
+    serverSelection.style.display = 'none';
+    rankView.style.display = 'block';
+    
+    // LOADING ပြပြီး အသစ် DATA ယူ
+    startOneByOneFetching();
+}
+
+function switchRankTab(type) {
+    console.log('✅ Switch Rank Tab:', type);
+    
+    // OLD DATA အကုန်ဖြတ်
+    resetRankData();
+    
+    currentRankType = type;
+    
+    // Update active tab
+    rankTabs.forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.dataset.type === type) {
+            tab.classList.add('active');
+        }
+    });
+    
+    // LOADING ပြပြီး အသစ် DATA ယူ
+    startOneByOneFetching();
+}
+
+function resetRankData() {
+    console.log('🗑️ Resetting Rank Data...');
+    
+    // Hide list container
+    if (rankListContainer) {
+        rankListContainer.style.display = 'none';
+    }
+    
+    // Clear list - OLD DATA အကုန်ဖြတ်
+    if (rankList) {
+        rankList.innerHTML = '';
+    }
+    
+    // Show loading
+    if (rankLoading) {
+        rankLoading.style.display = 'block';
+    }
+    
+    // Reset fetching flag
+    isFetching = false;
+}
+
+// တစ်ယောက်စီ Data ယူ
+async function startOneByOneFetching() {
+    if (isFetching) return;
+    isFetching = true;
+    
+    console.log('🔄 Starting One-by-One Fetching...');
+    
+    try {
+        // First get total user count
+        const totalUsers = await getTotalUserCount();
+        console.log(`👥 Total users in Server ${currentServerIndex + 1}: ${totalUsers}`);
+        
+        if (totalUsers === 0) {
+            showNoDataMessage();
+            isFetching = false;
+            return;
+        }
+        
+        // Fetch users one by one
+        for (let i = 0; i < totalUsers; i++) {
+            // Check if we should stop
+            if (!isFetching) {
+                console.log('⏹️ Fetching stopped');
+                break;
+            }
+            
+            // Fetch single user
+            const user = await fetchSingleUser(i);
+            
+            if (user) {
+                // တစ်ယောက်ယူပြီးတာနဲ့ တစ်ယောက်ကိုတန်းပြသပေး
+                displayUserImmediately(user, i + 1);
+                
+                // Small delay between users
+                if (i < totalUsers - 1) {
+                    await delay(50); // 50ms delay
+                }
+            }
+        }
+        
+        // Finish loading
+        if (isFetching) {
+            finishLoading();
+        }
+        
+    } catch (error) {
+        console.error('❌ Fetch error:', error);
+        showErrorMessage();
+        isFetching = false;
+    }
+}
+
+// Get total user count
+async function getTotalUserCount() {
+    try {
+        const supabaseClient = getSupabaseClient(currentServerIndex);
+        const { count, error } = await supabaseClient
+            .from('users')
+            .select('*', { count: 'exact', head: true });
+        
+        if (error) {
+            console.error('Count error:', error);
+            return 0;
+        }
+        
+        return Math.min(count || 0, 100); // Max 100 users
+    } catch (error) {
+        console.error('Get count error:', error);
+        return 0;
+    }
+}
+
+// Fetch single user by position (တစ်ယောက်စီ)
+async function fetchSingleUser(position) {
+    try {
+        const supabaseClient = getSupabaseClient(currentServerIndex);
+        const orderField = currentRankType === 'coins' ? 'coins' : 'tokens';
+        
+        const { data, error } = await supabaseClient
+            .from('users')
+            .select('user_id, user_name, profile_image, tokens, coins')
+            .order(orderField, { ascending: false })
+            .range(position, position)
+            .limit(1);
+        
+        if (error) {
+            console.error(`Fetch error for position ${position}:`, error);
+            return null;
+        }
+        
+        return data && data.length > 0 ? data[0] : null;
+    } catch (error) {
+        console.error(`Single user fetch error:`, error);
+        return null;
+    }
+}
+
+// တစ်ယောက်ယူပြီးတာနဲ့ တစ်ယောက်ကိုတန်းပြသပေး
+function displayUserImmediately(user, position) {
+    if (!rankList) return;
+    
+    const rankItem = document.createElement('div');
+    rankItem.className = 'rank-item';
+    
+    // Add classes for top 3
+    if (position === 1) rankItem.classList.add('top-1');
+    else if (position === 2) rankItem.classList.add('top-2');
+    else if (position === 3) rankItem.classList.add('top-3');
+    
+    // Check if current user
+    if (user.user_id === currentUserData.userID) {
+        rankItem.classList.add('current-user');
+    }
+    
+    // Get score and icon based on rank type
+    const score = currentRankType === 'coins' ? (user.coins || 0) : (user.tokens || 0);
+    const iconSrc = currentRankType === 'coins' ? COIN_ICON : TOKEN_ICON;
+    
+    // Profile image or emoji
+    let profileContent = '';
+    if (user.profile_image) {
+        profileContent = `<img src="${user.profile_image}" alt="Profile">`;
+    } else {
+        profileContent = '<div class="rank-emoji">👤</div>';
+    }
+    
+    rankItem.innerHTML = `
+        <div class="rank-position">#${position}</div>
+        <div class="rank-profile">${profileContent}</div>
+        <div class="rank-info">
+            <div class="rank-name">${user.user_name || 'Unknown'}</div>
+            <div class="rank-score-display">
+                <img src="${iconSrc}" class="score-icon">
+                <span class="score-amount">${score.toLocaleString()}</span>
+            </div>
+        </div>
+    `;
+    
+    // တစ်ယောက်ယူပြီးတာနဲ့ တန်းပြသပေး
+    rankList.appendChild(rankItem);
+    
+    // Show list container when first item is added
+    if (position === 1 && rankListContainer) {
+        rankListContainer.style.display = 'block';
+        if (rankLoading) {
+            rankLoading.style.display = 'none';
+        }
+    }
+    
+    console.log(`✅ Displayed user #${position}: ${user.user_name || 'Unknown'}`);
+}
+
+// Finish loading
+function finishLoading() {
+    if (rankLoading) {
+        rankLoading.style.display = 'none';
+    }
+    if (rankListContainer && rankList.children.length > 0) {
+        rankListContainer.style.display = 'block';
+    }
+    isFetching = false;
+    console.log('✅ Fetching completed');
+}
+
+// Show no data message
+function showNoDataMessage() {
+    if (rankLoading) {
+        rankLoading.style.display = 'none';
+    }
+    if (rankList) {
+        rankList.innerHTML = '<div style="text-align:center;color:white;padding:40px;font-size:16px;">No users found in this server</div>';
+        rankListContainer.style.display = 'block';
+    }
+}
+
+// Show error message
+function showErrorMessage() {
+    if (rankLoading) {
+        rankLoading.style.display = 'none';
+    }
+    if (rankList) {
+        rankList.innerHTML = '<div style="text-align:center;color:#ff6b6b;padding:40px;font-size:16px;">Error loading rank data</div>';
+        rankListContainer.style.display = 'block';
+    }
+}
+
+// Helper function for delay
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(initializeRankSystem, 100);
+});
 
 </script>
 </body>
