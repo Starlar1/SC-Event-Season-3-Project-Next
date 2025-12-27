@@ -1,4 +1,4 @@
-<meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<meta name='viewport' content='width=device-width, initial-scale=1'/> <meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
 <html lang="en">
 <head>
     <!-- Supabase Client -->
@@ -6866,92 +6866,203 @@ if (originalEnterBtn) {
     };
 }
 
-// ===== RANK SYSTEM - CLEAN FINAL VERSION =====
+// ===== RANK SYSTEM - FINAL FIXED VERSION =====
 
-// Rank Screen HTML
-const rankScreenHTML = `
-<div class="rank-screen" id="rank-screen" style="display:none;">
-    <div class="rank-background"></div>
+// 1. Add Rank Button to Sidebar
+function addRankButtonToSidebar() {
+    const sidebarButtons = document.getElementById('sidebar-buttons');
+    if (!sidebarButtons) return;
     
-    <div class="rank-content">
-        <!-- Back Button -->
-        <button class="rank-back-btn" id="rank-back-btn">
-            <svg class="back-icon" viewBox="0 0 24 24">
-                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-            </svg>
-            Back
+    if (document.getElementById('rank-btn')) return;
+    
+    const rankButtonHTML = `
+        <button class="sidebar-btn" id="rank-btn">
+            <span>Rank</span>
         </button>
+    `;
+    
+    sidebarButtons.insertAdjacentHTML('beforeend', rankButtonHTML);
+}
+
+// 2. Rank System HTML (NO ID DISPLAY)
+const rankSystemHTML = `
+<!-- Rank Server Selection Screen -->
+<div class="rank-server-screen" id="rank-server-screen" style="display:none;">
+    <div class="rank-server-background"></div>
+    
+    <div class="rank-server-content">
+        <!-- Header -->
+        <div class="server-header">
+            <button class="rank-back-btn" id="rank-server-back-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+                Back
+            </button>
+            <div class="server-title">
+                <div class="title-text">Select Server</div>
+            </div>
+        </div>
         
-        <!-- Server Selection -->
-        <div class="server-selection" id="server-selection">
-            <h2 class="section-title">Server ရွေးပါ</h2>
-            
+        <!-- Server Grid -->
+        <div class="server-grid-container">
             <div class="server-grid">
                 <div class="server-card" data-server="0">
-                    <div class="server-info">
-                        <h3 class="server-name">Server 1</h3>
+                    <div class="server-card-inner">
+                        <div class="server-icon-container">
+                            <div class="server-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="#3498db">
+                                    <path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="server-info">
+                            <div class="server-name">Server 1</div>
+                            <div class="server-user-count">
+                                <span class="loading-text">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="server-select-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                                <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                            </svg>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="server-card" data-server="1">
-                    <div class="server-info">
-                        <h3 class="server-name">Server 2</h3>
+                    <div class="server-card-inner">
+                        <div class="server-icon-container">
+                            <div class="server-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="#2ecc71">
+                                    <path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="server-info">
+                            <div class="server-name">Server 2</div>
+                            <div class="server-user-count">
+                                <span class="loading-text">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="server-select-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                                <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                            </svg>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="server-card" data-server="2">
-                    <div class="server-info">
-                        <h3 class="server-name">Server 3</h3>
+                    <div class="server-card-inner">
+                        <div class="server-icon-container">
+                            <div class="server-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="#9b59b6">
+                                    <path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="server-info">
+                            <div class="server-name">Server 3</div>
+                            <div class="server-user-count">
+                                <span class="loading-text">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="server-select-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                                <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                            </svg>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="server-card" data-server="3">
-                    <div class="server-info">
-                        <h3 class="server-name">Server 4</h3>
+                    <div class="server-card-inner">
+                        <div class="server-icon-container">
+                            <div class="server-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="#e74c3c">
+                                    <path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="server-info">
+                            <div class="server-name">Server 4</div>
+                            <div class="server-user-count">
+                                <span class="loading-text">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="server-select-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                                <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                            </svg>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Rank View -->
-        <div class="rank-view" id="rank-view" style="display:none;">
-            <!-- Rank Title -->
-            <h2 class="rank-main-title">Rank</h2>
-            
-            <!-- Rank Tabs -->
-            <div class="rank-tabs-row">
-                <button class="rank-tab active" data-type="coins">
-                    Coins Rank
-                </button>
-                <button class="rank-tab" data-type="tokens">
-                    Token Rank
-                </button>
-            </div>
-            
-            <!-- Current Server -->
-            <div class="current-server-info">
-                <span class="server-name-display" id="current-server-name">Server 1</span>
-            </div>
-            
-            <!-- Loading -->
-            <div class="rank-loading" id="rank-loading">
-                <div class="loader"></div>
-                <p>Loading...</p>
-            </div>
-            
-            <!-- Rank List -->
-            <div class="rank-list-container" id="rank-list-container">
-                <div class="rank-list" id="rank-list">
-                    <!-- Rank items will appear here -->
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Rank Display Screen -->
+<div class="rank-display-screen" id="rank-display-screen" style="display:none;">
+    <div class="rank-display-background"></div>
+    
+    <div class="rank-display-content">
+        <!-- Top Bar -->
+        <div class="rank-top-bar">
+            <button class="rank-back-btn" id="rank-display-back-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+                Back
+            </button>
+        </div>
+        
+        <!-- Rank Type Selector -->
+        <div class="rank-type-selector">
+            <div class="type-buttons">
+                <button class="type-btn active" data-type="coins">
+                    Coins Rank
+                </button>
+                <button class="type-btn" data-type="tokens">
+                    Token Rank
+                </button>
+            </div>
+        </div>
+        
+        <!-- Rank Container -->
+        <div class="rank-container">
+            <!-- Loading -->
+            <div class="rank-loading" id="rank-loading">
+                <div class="loading-spinner-yellow"></div>
+                <div class="loading-text">Loading rankings...</div>
+            </div>
+            
+            <!-- Empty -->
+            <div class="rank-empty" id="rank-empty" style="display:none;">
+                <div class="empty-content">
+                    <div class="empty-text">No rankings available</div>
+                </div>
+            </div>
+            
+            <!-- Rank List -->
+            <div class="rank-list" id="rank-list">
+                <!-- Rank items will be loaded here -->
+            </div>
+            
+            <!-- Load More Button -->
+            <div class="load-more-container" id="load-more-container" style="display:none;">
+                <button class="load-more-btn" id="load-more-btn">
+                    Load More
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
-/* Rank Screen Styles */
-.rank-screen {
+/* ===== RANK SYSTEM STYLES ===== */
+.rank-server-screen, .rank-display-screen {
     position: fixed;
     top: 0;
     left: 0;
@@ -6959,206 +7070,293 @@ const rankScreenHTML = `
     height: 100vh;
     z-index: 1000;
     display: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 }
 
-.rank-background {
+/* Background */
+.rank-server-background {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: url("https://i.ibb.co/3mGsf5ZK/7347c3a657785bd57dd49098a20ff5e9-1.jpg") center no-repeat;
-    background-size: cover;
-    filter: brightness(0.7);
+    background: url("https://i.ibb.co/3mGsf5ZK/7347c3a657785bd57dd49098a20ff5e9-1.jpg") center/cover no-repeat;
+    filter: brightness(0.4);
 }
 
-.rank-content {
+.rank-display-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url("https://i.ibb.co/3mGsf5ZK/7347c3a657785bd57dd49098a20ff5e9-1.jpg") center/cover no-repeat;
+    filter: brightness(0.3);
+}
+
+/* Server Selection Screen */
+.rank-server-content {
     position: relative;
     width: 100%;
     height: 100%;
-    padding: 20px;
-    padding-top: 70px;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Back Button */
+/* Header */
+.server-header {
+    padding: 20px;
+    padding-top: 40px;
+}
+
 .rank-back-btn {
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    background: #2196F3;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: bold;
-    z-index: 10;
     display: flex;
     align-items: center;
     gap: 8px;
-    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.5);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-}
-
-.back-icon {
-    width: 18px;
-    height: 18px;
-    fill: currentColor;
-}
-
-/* Server Selection */
-.server-selection {
-    max-width: 400px;
-    margin: 0 auto;
-    padding-top: 50px;
-}
-
-.section-title {
+    background: rgba(52, 152, 219, 0.9);
     color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.rank-back-btn:hover {
+    background: rgba(41, 128, 185, 0.9);
+    transform: translateY(-2px);
+}
+
+.server-title {
+    margin-top: 15px;
+}
+
+.title-text {
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
     text-align: center;
-    font-size: 20px;
-    margin-bottom: 25px;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Server Grid */
+.server-grid-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    -webkit-overflow-scrolling: touch;
 }
 
 .server-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+    width: 100%;
 }
 
-/* Server Card - Brighter Blue */
 .server-card {
-    background: #2196F3;
-    border-radius: 12px;
-    padding: 15px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
     cursor: pointer;
-    border: 2px solid rgba(255, 255, 255, 0.4);
     transition: all 0.3s ease;
-    text-align: center;
-    box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
 }
 
 .server-card:hover {
-    background: #1976D2;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(33, 150, 243, 0.5);
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-5px);
+    border-color: rgba(52, 152, 219, 0.3);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.server-card-inner {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.server-icon-container {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.server-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .server-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
+    flex: 1;
+    min-width: 0;
 }
 
 .server-name {
     color: white;
-    font-size: 16px;
-    margin: 0;
-    font-weight: 500;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5px;
 }
 
-/* Rank View */
-.rank-view {
-    max-width: 500px;
+.server-user-count {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.server-user-count .loading-text {
+    color: rgba(255, 255, 255, 0.4);
+    font-style: italic;
+}
+
+.server-select-btn {
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+.server-card:hover .server-select-btn {
+    opacity: 1;
+    transform: translateX(5px);
+}
+
+/* Rank Display Screen */
+.rank-display-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Top Bar */
+.rank-top-bar {
+    padding: 20px;
+    padding-top: 40px;
+}
+
+/* Rank Type Selector */
+.rank-type-selector {
+    padding: 15px 20px;
+}
+
+.type-buttons {
+    display: flex;
+    gap: 10px;
+    max-width: 300px;
     margin: 0 auto;
 }
 
-/* Rank Title */
-.rank-main-title {
-    color: white;
-    text-align: center;
-    font-size: 32px;
-    margin: 0 0 20px 0;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-}
-
-/* Rank Tabs - Brighter Blue */
-.rank-tabs-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.rank-tab {
+.type-btn {
     flex: 1;
-    padding: 12px;
-    background: #2196F3;
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    color: white;
-    border-radius: 10px;
+    background: rgba(52, 152, 219, 0.2);
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    border-radius: 8px;
+    padding: 10px 15px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
-}
-
-.rank-tab.active {
-    background: #1976D2;
-    box-shadow: 0 0 15px rgba(33, 150, 243, 0.7);
-}
-
-.rank-tab:hover:not(.active) {
-    background: #1976D2;
-    box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
-}
-
-/* Current Server */
-.current-server-info {
     text-align: center;
-    margin-bottom: 20px;
+    backdrop-filter: blur(5px);
 }
 
-.server-name-display {
-    background: #2196F3;
+.type-btn.active {
+    background: rgba(52, 152, 219, 0.8);
     color: white;
-    padding: 8px 20px;
-    border-radius: 15px;
-    font-size: 14px;
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+    border-color: rgba(52, 152, 219, 0.8);
+    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
 }
 
-/* Loading */
+.type-btn:hover:not(.active) {
+    background: rgba(52, 152, 219, 0.3);
+    color: white;
+}
+
+/* Rank Container */
+.rank-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px 20px 20px;
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Loading State */
 .rank-loading {
-    text-align: center;
-    padding: 30px;
-    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
 }
 
-.loader {
-    width: 30px;
-    height: 30px;
-    border: 3px solid rgba(255, 255, 255, 0.2);
-    border-top: 3px solid #2196F3;
+.loading-spinner-yellow {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #FFD700;
     border-radius: 50%;
-    margin: 0 auto 15px;
     animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+.rank-loading .loading-text {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-.rank-loading p {
-    color: white;
-    margin: 0;
-    font-weight: 500;
+/* Empty State */
+.rank-empty {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
 }
 
-/* Rank List Container */
-.rank-list-container {
-    background: rgba(33, 150, 243, 0.25);
+.empty-content {
+    text-align: center;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    padding: 30px;
     border-radius: 15px;
-    padding: 15px;
-    border: 2px solid rgba(33, 150, 243, 0.5);
-    min-height: 400px;
-    max-height: 500px;
-    overflow-y: auto;
-    box-shadow: 0 5px 15px rgba(33, 150, 243, 0.2);
-    display: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.empty-text {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+    font-weight: 400;
 }
 
 /* Rank List */
@@ -7168,19 +7366,18 @@ const rankScreenHTML = `
     gap: 10px;
 }
 
-/* Rank Item - Brighter Blue Background */
 .rank-item {
-    background: #2196F3;
-    border-radius: 12px;
-    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border-radius: 15px;
+    padding: 15px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+    gap: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: slideIn 0.3s ease forwards;
     opacity: 0;
     transform: translateY(10px);
-    animation: slideIn 0.5s ease forwards;
 }
 
 @keyframes slideIn {
@@ -7190,497 +7387,704 @@ const rankScreenHTML = `
     }
 }
 
-.rank-item.current-user {
-    background: #1976D2;
-    border-color: rgba(255, 255, 255, 0.6);
-    box-shadow: 0 0 20px rgba(33, 150, 243, 0.7);
-}
-
-/* Position Text - Just text, no circle */
 .rank-position {
-    color: white;
-    font-weight: bold;
-    font-size: 18px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
-    min-width: 35px;
-    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
 }
 
-.rank-item.top-1 .rank-position {
-    color: gold;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+.rank-position.top-1 {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #333;
 }
 
-.rank-item.top-2 .rank-position {
-    color: silver;
-    text-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
+.rank-position.top-2 {
+    background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+    color: #333;
 }
 
-.rank-item.top-3 .rank-position {
-    color: #FFB74D;
-    text-shadow: 0 0 10px rgba(255, 183, 77, 0.5);
+.rank-position.top-3 {
+    background: linear-gradient(135deg, #CD7F32, #A0522D);
+    color: white;
 }
 
 /* Profile Circle */
 .rank-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.profile-circle {
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    overflow: hidden;
-    flex-shrink: 0;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid rgba(255, 255, 255, 0.4);
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
 }
 
-.rank-profile img {
+.profile-circle img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.rank-emoji {
-    font-size: 28px;
+.initials {
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
-/* Rank Info */
-.rank-info {
+.profile-info {
     flex: 1;
     min-width: 0;
 }
 
-.rank-name {
+.profile-name {
     color: white;
-    font-size: 16px;
-    margin: 0 0 5px 0;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 3px;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
-    font-weight: 500;
 }
 
-.rank-score-display {
+/* NO ID DISPLAY - REMOVED .profile-id */
+
+.rank-score {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.score-value {
+    color: #FFD700;
+    font-size: 15px;
+    font-weight: 600;
+    min-width: 60px;
+    text-align: right;
 }
 
 .score-icon {
     width: 20px;
     height: 20px;
     object-fit: contain;
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
 }
 
-.score-amount {
-    color: #FFD700;
+/* Load More Button */
+.load-more-container {
+    padding: 20px 0;
+    text-align: center;
+}
+
+.load-more-btn {
+    background: rgba(52, 152, 219, 0.2);
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    border-radius: 10px;
+    padding: 12px 24px;
+    color: rgba(255, 255, 255, 0.8);
     font-size: 14px;
-    font-weight: bold;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 200px;
+    margin: 0 auto;
+    backdrop-filter: blur(5px);
 }
 
-/* Scrollbar */
-.rank-list-container::-webkit-scrollbar {
-    width: 8px;
+.load-more-btn:hover:not(:disabled) {
+    background: rgba(52, 152, 219, 0.3);
+    color: white;
+    transform: translateY(-2px);
 }
 
-.rank-list-container::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 4px;
+.load-more-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
-.rank-list-container::-webkit-scrollbar-thumb {
-    background: rgba(33, 150, 243, 0.6);
-    border-radius: 4px;
-}
-
-.rank-list-container::-webkit-scrollbar-thumb:hover {
-    background: rgba(33, 150, 243, 0.8);
-}
-
-/* Mobile */
-@media (max-width: 600px) {
-    .server-grid {
-        grid-template-columns: 1fr;
+/* Responsive Design */
+@media (max-width: 768px) {
+    .server-card-inner {
+        padding: 16px;
+        gap: 12px;
     }
     
-    .rank-content {
-        padding: 15px;
-        padding-top: 60px;
+    .server-icon-container {
+        width: 50px;
+        height: 50px;
     }
     
-    .rank-main-title {
-        font-size: 26px;
+    .server-icon {
+        width: 40px;
+        height: 40px;
     }
     
-    .rank-tab {
-        padding: 10px;
+    .server-name {
+        font-size: 16px;
+    }
+    
+    .type-buttons {
+        max-width: 280px;
+    }
+    
+    .type-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .rank-item {
+        padding: 12px;
+        gap: 12px;
+    }
+    
+    .rank-position {
+        width: 35px;
+        height: 35px;
         font-size: 14px;
+    }
+    
+    .profile-circle {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .initials {
+        font-size: 14px;
+    }
+    
+    .profile-name {
+        font-size: 13px;
+    }
+    
+    .score-value {
+        font-size: 14px;
+        min-width: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .server-header {
+        padding: 16px;
+        padding-top: 40px;
+    }
+    
+    .title-text {
+        font-size: 20px;
+    }
+    
+    .server-grid-container {
+        padding: 16px;
+    }
+    
+    .rank-type-selector {
+        padding: 12px 16px;
+    }
+    
+    .rank-container {
+        padding: 0 16px 16px 16px;
     }
     
     .rank-item {
         padding: 10px;
         gap: 10px;
     }
-    
-    .rank-profile {
-        width: 40px;
-        height: 40px;
-    }
-    
-    .rank-name {
-        font-size: 14px;
-    }
 }
 </style>
 `;
 
-// Insert HTML
-document.body.insertAdjacentHTML('beforeend', rankScreenHTML);
-
 // Rank System Variables
-let rankScreen, rankBackBtn, serverSelection, rankView;
-let serverCards, rankTabs, currentServerName, rankLoading, rankListContainer, rankList;
-let currentServerIndex = 0;
-let currentRankType = 'coins';
-let isFetching = false;
-let currentUserData = {};
+let rankSystemInitialized = false;
+let activeServerIndex = 0;
+let activeRankType = 'coins';
+let currentPage = 0;
+const BATCH_SIZE = 5;
+let currentAbortController = null;
+let isLoading = false;
+let hasMoreUsers = true;
+let loadingTimeout = null;
 
-// Image URLs
-const COIN_ICON = "https://i.ibb.co/JWHLf84k/Grid-Art-20251225-163557125.png";
-const TOKEN_ICON = "https://i.ibb.co/YTbp2Z70/Grid-Art-20251201-170338013.png";
-
+// Initialize Rank System
 function initializeRankSystem() {
-    // Get elements
-    rankScreen = document.getElementById('rank-screen');
-    rankBackBtn = document.getElementById('rank-back-btn');
-    serverSelection = document.getElementById('server-selection');
-    rankView = document.getElementById('rank-view');
-    currentServerName = document.getElementById('current-server-name');
-    rankLoading = document.getElementById('rank-loading');
-    rankListContainer = document.getElementById('rank-list-container');
-    rankList = document.getElementById('rank-list');
+    if (rankSystemInitialized) return;
+    rankSystemInitialized = true;
     
-    // Get current user data
-    currentUserData = JSON.parse(localStorage.getItem('gameUserData') || '{}');
-    
-    // Server cards
-    serverCards = document.querySelectorAll('.server-card');
-    serverCards.forEach(card => {
-        card.addEventListener('click', function() {
-            const serverIndex = parseInt(this.dataset.server);
-            selectServer(serverIndex);
-        });
-    });
-    
-    // Rank tabs
-    rankTabs = document.querySelectorAll('.rank-tab');
-    rankTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            const type = this.dataset.type;
-            switchRankTab(type);
-        });
-    });
+    // Insert HTML
+    document.body.insertAdjacentHTML('beforeend', rankSystemHTML);
     
     // Add Rank button to sidebar
     addRankButtonToSidebar();
     
-    // Event listeners
-    rankBackBtn.addEventListener('click', hideRankScreen);
+    // Setup event listeners
+    setupRankEvents();
 }
 
-function addRankButtonToSidebar() {
-    const rankBtn = document.createElement('button');
-    rankBtn.className = 'sidebar-btn';
-    rankBtn.id = 'rank-btn';
-    rankBtn.innerHTML = '<span>Rank </span>';
-    
-    const sidebarButtons = document.getElementById('sidebar-buttons');
-    if (sidebarButtons) {
-        sidebarButtons.appendChild(rankBtn);
-        rankBtn.addEventListener('click', showRankScreen);
-    }
-}
-
-function showRankScreen() {
-    document.getElementById('game-container').style.display = 'none';
-    rankScreen.style.display = 'block';
-    serverSelection.style.display = 'block';
-    rankView.style.display = 'none';
-    
-    // Stop any ongoing fetching
-    if (isFetching) {
-        isFetching = false;
-    }
-    
-    resetRankData();
-}
-
-function hideRankScreen() {
-    // Stop any ongoing fetching
-    if (isFetching) {
-        isFetching = false;
-    }
-    
-    rankScreen.style.display = 'none';
-    document.getElementById('game-container').style.display = 'block';
-}
-
-function selectServer(serverIndex) {
-    console.log('✅ Select Server:', serverIndex);
-    
-    // OLD DATA အကုန်ဖြတ်
-    resetRankData();
-    
-    currentServerIndex = serverIndex;
-    currentServerName.textContent = `Server ${serverIndex + 1}`;
-    
-    serverSelection.style.display = 'none';
-    rankView.style.display = 'block';
-    
-    // LOADING ပြပြီး အသစ် DATA ယူ
-    startOneByOneFetching();
-}
-
-function switchRankTab(type) {
-    console.log('✅ Switch Rank Tab:', type);
-    
-    // OLD DATA အကုန်ဖြတ်
-    resetRankData();
-    
-    currentRankType = type;
-    
-    // Update active tab
-    rankTabs.forEach(tab => {
-        tab.classList.remove('active');
-        if (tab.dataset.type === type) {
-            tab.classList.add('active');
+// Setup event listeners
+function setupRankEvents() {
+    // Rank button click
+    setTimeout(() => {
+        const rankBtn = document.getElementById('rank-btn');
+        if (rankBtn) {
+            rankBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                showRankServerScreen();
+            }, { passive: true });
         }
-    });
+    }, 100);
     
-    // LOADING ပြပြီး အသစ် DATA ယူ
-    startOneByOneFetching();
+    // Server screen events
+    setTimeout(() => {
+        // Back button
+        const rankServerBackBtn = document.getElementById('rank-server-back-btn');
+        if (rankServerBackBtn) {
+            rankServerBackBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                hideRankServerScreen();
+            }, { passive: true });
+        }
+        
+        // Server cards
+        const serverCards = document.querySelectorAll('.server-card');
+        serverCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const serverIndex = parseInt(this.dataset.server);
+                showRankDisplayScreen(serverIndex);
+            }, { passive: true });
+        });
+    }, 200);
+    
+    // Rank display events
+    setTimeout(() => {
+        // Back button
+        const rankDisplayBackBtn = document.getElementById('rank-display-back-btn');
+        if (rankDisplayBackBtn) {
+            rankDisplayBackBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                hideRankDisplayScreen();
+            }, { passive: true });
+        }
+        
+        // Rank type buttons
+        const typeButtons = document.querySelectorAll('.type-btn');
+        typeButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const newType = this.dataset.type;
+                
+                // Immediately stop current loading and clear data
+                cancelCurrentLoading(true);
+                
+                // Update active button
+                typeButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Change rank type and reload
+                activeRankType = newType;
+                currentPage = 0;
+                hasMoreUsers = true;
+                loadServerRankings(activeServerIndex, activeRankType);
+            }, { passive: true });
+        });
+        
+        // Load more button
+        const loadMoreBtn = document.getElementById('load-more-btn');
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                loadMoreRankings();
+            }, { passive: true });
+        }
+    }, 200);
 }
 
-function resetRankData() {
-    console.log('🗑️ Resetting Rank Data...');
-    
-    // Hide list container
-    if (rankListContainer) {
-        rankListContainer.style.display = 'none';
+// Cancel current loading with immediate cleanup
+function cancelCurrentLoading(clearData = false) {
+    if (currentAbortController) {
+        currentAbortController.abort();
+        currentAbortController = null;
     }
     
-    // Clear list - OLD DATA အကုန်ဖြတ်
-    if (rankList) {
-        rankList.innerHTML = '';
+    if (loadingTimeout) {
+        clearTimeout(loadingTimeout);
+        loadingTimeout = null;
     }
+    
+    if (clearData) {
+        const rankList = document.getElementById('rank-list');
+        if (rankList) {
+            rankList.innerHTML = '';
+        }
+    }
+    
+    isLoading = false;
+}
+
+// Show server selection screen
+function showRankServerScreen() {
+    const gameContainer = document.getElementById('game-container');
+    if (!gameContainer) return;
+    
+    // Hide game container
+    gameContainer.style.display = 'none';
+    
+    // Show server screen
+    const rankServerScreen = document.getElementById('rank-server-screen');
+    if (rankServerScreen) {
+        rankServerScreen.style.display = 'block';
+        loadServerUserCounts(); // Load counts only when screen is shown
+    }
+}
+
+// Hide server selection screen
+function hideRankServerScreen() {
+    const rankServerScreen = document.getElementById('rank-server-screen');
+    if (rankServerScreen) {
+        rankServerScreen.style.display = 'none';
+    }
+    
+    const gameContainer = document.getElementById('game-container');
+    if (gameContainer) {
+        gameContainer.style.display = 'block';
+    }
+}
+
+// Show rank display screen
+function showRankDisplayScreen(serverIndex) {
+    // Immediately stop any ongoing loading and clear data
+    cancelCurrentLoading(true);
+    
+    // Reset variables
+    activeServerIndex = serverIndex;
+    activeRankType = 'coins';
+    currentPage = 0;
+    hasMoreUsers = true;
+    
+    // Hide server selection screen
+    const rankServerScreen = document.getElementById('rank-server-screen');
+    if (rankServerScreen) {
+        rankServerScreen.style.display = 'none';
+    }
+    
+    // Show rank display screen
+    const rankDisplayScreen = document.getElementById('rank-display-screen');
+    if (rankDisplayScreen) {
+        rankDisplayScreen.style.display = 'block';
+        
+        // Reset type buttons
+        const typeButtons = document.querySelectorAll('.type-btn');
+        typeButtons.forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.type === 'coins') {
+                btn.classList.add('active');
+            }
+        });
+        
+        // Show loading and clear previous data
+        const loading = document.getElementById('rank-loading');
+        const rankList = document.getElementById('rank-list');
+        const loadMoreContainer = document.getElementById('load-more-container');
+        
+        if (loading) loading.style.display = 'flex';
+        if (rankList) rankList.innerHTML = '';
+        if (loadMoreContainer) loadMoreContainer.style.display = 'none';
+        
+        // Load rankings with small delay to show loading
+        loadingTimeout = setTimeout(() => {
+            loadServerRankings(serverIndex, 'coins');
+        }, 100);
+    }
+}
+
+// Hide rank display screen
+function hideRankDisplayScreen() {
+    cancelCurrentLoading(true);
+    const rankDisplayScreen = document.getElementById('rank-display-screen');
+    if (rankDisplayScreen) {
+        rankDisplayScreen.style.display = 'none';
+    }
+    
+    showRankServerScreen();
+}
+
+// Load server user counts (only when rank button clicked)
+async function loadServerUserCounts() {
+    try {
+        for (let i = 0; i < 4; i++) {
+            try {
+                const supabaseClient = getSupabaseClient(i);
+                const { count, error } = await supabaseClient
+                    .from('users')
+                    .select('*', { count: 'exact', head: true });
+                
+                if (!error && count !== null) {
+                    updateServerUserCount(i, count);
+                } else {
+                    updateServerUserCount(i, 0);
+                }
+            } catch (error) {
+                console.log(`Failed to load server ${i + 1} count`);
+                updateServerUserCount(i, 0);
+            }
+        }
+    } catch (error) {
+        console.error('Error loading server counts:', error);
+    }
+}
+
+// Update server user count display
+function updateServerUserCount(serverIndex, count) {
+    const serverCards = document.querySelectorAll('.server-card');
+    if (serverCards[serverIndex]) {
+        const userCountElement = serverCards[serverIndex].querySelector('.server-user-count');
+        if (userCountElement) {
+            userCountElement.textContent = `${count} User${count !== 1 ? 's' : ''}`;
+        }
+    }
+}
+
+// Load server rankings (5 users at a time)
+async function loadServerRankings(serverIndex, rankType = 'coins') {
+    if (isLoading) return;
+    
+    isLoading = true;
+    currentPage = 0;
+    
+    // Cancel any previous loading
+    cancelCurrentLoading();
+    currentAbortController = new AbortController();
     
     // Show loading
-    if (rankLoading) {
-        rankLoading.style.display = 'block';
-    }
+    const loading = document.getElementById('rank-loading');
+    const empty = document.getElementById('rank-empty');
+    const rankList = document.getElementById('rank-list');
+    const loadMoreContainer = document.getElementById('load-more-container');
     
-    // Reset fetching flag
-    isFetching = false;
-}
-
-// တစ်ယောက်စီ Data ယူ
-async function startOneByOneFetching() {
-    if (isFetching) return;
-    isFetching = true;
-    
-    console.log('🔄 Starting One-by-One Fetching...');
+    if (loading) loading.style.display = 'flex';
+    if (empty) empty.style.display = 'none';
+    if (rankList) rankList.innerHTML = '';
+    if (loadMoreContainer) loadMoreContainer.style.display = 'none';
     
     try {
-        // First get total user count
-        const totalUsers = await getTotalUserCount();
-        console.log(`👥 Total users in Server ${currentServerIndex + 1}: ${totalUsers}`);
+        // Get Supabase client
+        const supabaseClient = getSupabaseClient(serverIndex);
         
-        if (totalUsers === 0) {
-            showNoDataMessage();
-            isFetching = false;
-            return;
-        }
+        // Determine order field based on rank type
+        const orderField = rankType === 'tokens' ? 'tokens' : 'coins';
         
-        // Fetch users one by one
-        for (let i = 0; i < totalUsers; i++) {
-            // Check if we should stop
-            if (!isFetching) {
-                console.log('⏹️ Fetching stopped');
-                break;
-            }
-            
-            // Fetch single user
-            const user = await fetchSingleUser(i);
-            
-            if (user) {
-                // တစ်ယောက်ယူပြီးတာနဲ့ တစ်ယောက်ကိုတန်းပြသပေး
-                displayUserImmediately(user, i + 1);
-                
-                // Small delay between users
-                if (i < totalUsers - 1) {
-                    await delay(50); // 50ms delay
-                }
-            }
-        }
-        
-        // Finish loading
-        if (isFetching) {
-            finishLoading();
-        }
-        
-    } catch (error) {
-        console.error('❌ Fetch error:', error);
-        showErrorMessage();
-        isFetching = false;
-    }
-}
-
-// Get total user count
-async function getTotalUserCount() {
-    try {
-        const supabaseClient = getSupabaseClient(currentServerIndex);
-        const { count, error } = await supabaseClient
-            .from('users')
-            .select('*', { count: 'exact', head: true });
-        
-        if (error) {
-            console.error('Count error:', error);
-            return 0;
-        }
-        
-        return Math.min(count || 0, 100); // Max 100 users
-    } catch (error) {
-        console.error('Get count error:', error);
-        return 0;
-    }
-}
-
-// Fetch single user by position (တစ်ယောက်စီ)
-async function fetchSingleUser(position) {
-    try {
-        const supabaseClient = getSupabaseClient(currentServerIndex);
-        const orderField = currentRankType === 'coins' ? 'coins' : 'tokens';
-        
-        const { data, error } = await supabaseClient
+        // Fetch first 5 users
+        const { data: users, error } = await supabaseClient
             .from('users')
             .select('user_id, user_name, profile_image, tokens, coins')
             .order(orderField, { ascending: false })
-            .range(position, position)
-            .limit(1);
+            .range(currentPage * BATCH_SIZE, (currentPage * BATCH_SIZE) + BATCH_SIZE - 1);
         
-        if (error) {
-            console.error(`Fetch error for position ${position}:`, error);
-            return null;
+        // Check if request was aborted
+        if (currentAbortController.signal.aborted) {
+            isLoading = false;
+            return;
         }
         
-        return data && data.length > 0 ? data[0] : null;
+        // Hide loading
+        if (loading) loading.style.display = 'none';
+        
+        if (error) {
+            console.error('Error loading rankings:', error);
+            if (empty) empty.style.display = 'flex';
+            isLoading = false;
+            return;
+        }
+        
+        if (!users || users.length === 0) {
+            if (empty) empty.style.display = 'flex';
+            isLoading = false;
+            return;
+        }
+        
+        // Display first batch of rankings
+        displayRankings(users, rankType);
+        
+        // Check if there are more users to load
+        hasMoreUsers = users.length === BATCH_SIZE;
+        if (hasMoreUsers && loadMoreContainer) {
+            loadMoreContainer.style.display = 'block';
+        }
+        
+        currentPage++;
+        
     } catch (error) {
-        console.error(`Single user fetch error:`, error);
-        return null;
+        // Check if it's abort error
+        if (error.name === 'AbortError') {
+            console.log('Rank loading cancelled');
+        } else {
+            console.error('Error loading rankings:', error);
+            if (loading) loading.style.display = 'none';
+            if (empty) empty.style.display = 'flex';
+        }
     }
+    
+    isLoading = false;
 }
 
-// တစ်ယောက်ယူပြီးတာနဲ့ တစ်ယောက်ကိုတန်းပြသပေး
-function displayUserImmediately(user, position) {
+// Load more rankings
+async function loadMoreRankings() {
+    if (isLoading || !hasMoreUsers) return;
+    
+    isLoading = true;
+    
+    // Disable load more button
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    if (loadMoreBtn) {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.textContent = 'Loading...';
+    }
+    
+    try {
+        // Get Supabase client
+        const supabaseClient = getSupabaseClient(activeServerIndex);
+        
+        // Determine order field based on rank type
+        const orderField = activeRankType === 'tokens' ? 'tokens' : 'coins';
+        
+        // Fetch next batch of users
+        const { data: users, error } = await supabaseClient
+            .from('users')
+            .select('user_id, user_name, profile_image, tokens, coins')
+            .order(orderField, { ascending: false })
+            .range(currentPage * BATCH_SIZE, (currentPage * BATCH_SIZE) + BATCH_SIZE - 1);
+        
+        if (error) {
+            console.error('Error loading more rankings:', error);
+            hasMoreUsers = false;
+            return;
+        }
+        
+        if (!users || users.length === 0) {
+            hasMoreUsers = false;
+            const loadMoreContainer = document.getElementById('load-more-container');
+            if (loadMoreContainer) loadMoreContainer.style.display = 'none';
+            return;
+        }
+        
+        // Display additional rankings
+        displayRankings(users, activeRankType);
+        
+        // Check if there are more users to load
+        hasMoreUsers = users.length === BATCH_SIZE;
+        
+        currentPage++;
+        
+    } catch (error) {
+        console.error('Error loading more rankings:', error);
+        hasMoreUsers = false;
+    }
+    
+    // Re-enable load more button
+    if (loadMoreBtn) {
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.textContent = 'Load More';
+        
+        if (!hasMoreUsers) {
+            loadMoreBtn.disabled = true;
+            loadMoreBtn.textContent = 'No More Users';
+        }
+    }
+    
+    isLoading = false;
+}
+
+// Display rankings
+function displayRankings(users, rankType) {
+    const rankList = document.getElementById('rank-list');
     if (!rankList) return;
     
-    const rankItem = document.createElement('div');
-    rankItem.className = 'rank-item';
+    const startIndex = (currentPage * BATCH_SIZE);
     
-    // Add classes for top 3
-    if (position === 1) rankItem.classList.add('top-1');
-    else if (position === 2) rankItem.classList.add('top-2');
-    else if (position === 3) rankItem.classList.add('top-3');
+    users.forEach((user, index) => {
+        const globalIndex = startIndex + index;
+        const rankItem = createRankItem(user, globalIndex, rankType);
+        rankList.appendChild(rankItem);
+    });
+}
+
+// Create rank item (NO ID DISPLAY)
+function createRankItem(user, position, rankType) {
+    const div = document.createElement('div');
+    div.className = 'rank-item';
+    div.style.animationDelay = `${position * 0.05}s`;
     
-    // Check if current user
-    if (user.user_id === currentUserData.userID) {
-        rankItem.classList.add('current-user');
-    }
+    // Get initials from name
+    const initials = user.user_name ? user.user_name.charAt(0).toUpperCase() : 'U';
     
-    // Get score and icon based on rank type
-    const score = currentRankType === 'coins' ? (user.coins || 0) : (user.tokens || 0);
-    const iconSrc = currentRankType === 'coins' ? COIN_ICON : TOKEN_ICON;
+    // Get score based on rank type
+    const score = rankType === 'tokens' ? (user.tokens || 0) : (user.coins || 0);
     
-    // Profile image or emoji
-    let profileContent = '';
-    if (user.profile_image) {
-        profileContent = `<img src="${user.profile_image}" alt="Profile">`;
-    } else {
-        profileContent = '<div class="rank-emoji">👤</div>';
-    }
+    // Determine position class
+    let positionClass = '';
+    if (position === 0) positionClass = 'top-1';
+    else if (position === 1) positionClass = 'top-2';
+    else if (position === 2) positionClass = 'top-3';
     
-    rankItem.innerHTML = `
-        <div class="rank-position">#${position}</div>
-        <div class="rank-profile">${profileContent}</div>
-        <div class="rank-info">
-            <div class="rank-name">${user.user_name || 'Unknown'}</div>
-            <div class="rank-score-display">
-                <img src="${iconSrc}" class="score-icon">
-                <span class="score-amount">${score.toLocaleString()}</span>
+    // Determine icon based on rank type
+    const iconSrc = rankType === 'tokens' 
+        ? 'https://i.ibb.co/YTbp2Z70/Grid-Art-20251201-170338013.png'
+        : 'https://i.ibb.co/JWHLf84k/Grid-Art-20251225-163557125.png';
+    
+    div.innerHTML = `
+        <div class="rank-position ${positionClass}">${position + 1}</div>
+        
+        <div class="rank-profile">
+            <div class="profile-circle">
+                ${user.profile_image 
+                    ? `<img src="${user.profile_image}" alt="${user.user_name || 'User'}">`
+                    : `<div class="initials">${initials}</div>`
+                }
             </div>
+            <div class="profile-info">
+                <div class="profile-name">${user.user_name || 'Unknown User'}</div>
+                <!-- NO ID DISPLAY -->
+            </div>
+        </div>
+        
+        <div class="rank-score">
+            <div class="score-value">${score.toLocaleString()}</div>
+            <img src="${iconSrc}" class="score-icon" alt="${rankType}">
         </div>
     `;
     
-    // တစ်ယောက်ယူပြီးတာနဲ့ တန်းပြသပေး
-    rankList.appendChild(rankItem);
-    
-    // Show list container when first item is added
-    if (position === 1 && rankListContainer) {
-        rankListContainer.style.display = 'block';
-        if (rankLoading) {
-            rankLoading.style.display = 'none';
-        }
-    }
-    
-    console.log(`✅ Displayed user #${position}: ${user.user_name || 'Unknown'}`);
+    return div;
 }
 
-// Finish loading
-function finishLoading() {
-    if (rankLoading) {
-        rankLoading.style.display = 'none';
-    }
-    if (rankListContainer && rankList.children.length > 0) {
-        rankListContainer.style.display = 'block';
-    }
-    isFetching = false;
-    console.log('✅ Fetching completed');
-}
-
-// Show no data message
-function showNoDataMessage() {
-    if (rankLoading) {
-        rankLoading.style.display = 'none';
-    }
-    if (rankList) {
-        rankList.innerHTML = '<div style="text-align:center;color:white;padding:40px;font-size:16px;">No users found in this server</div>';
-        rankListContainer.style.display = 'block';
-    }
-}
-
-// Show error message
-function showErrorMessage() {
-    if (rankLoading) {
-        rankLoading.style.display = 'none';
-    }
-    if (rankList) {
-        rankList.innerHTML = '<div style="text-align:center;color:#ff6b6b;padding:40px;font-size:16px;">Error loading rank data</div>';
-        rankListContainer.style.display = 'block';
-    }
-}
-
-// Helper function for delay
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// Initialize when page loads
+// Initialize rank system when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(initializeRankSystem, 100);
 });
+
 
 </script>
 </body>
