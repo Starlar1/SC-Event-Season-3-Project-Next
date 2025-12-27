@@ -1,4 +1,4 @@
-<meta name='viewport' content='width=device-width, initial-scale=1'/> <meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/> <meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
 <html lang="en">
 <head>
     <!-- Supabase Client -->
@@ -8085,6 +8085,136 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(initializeRankSystem, 100);
 });
 
+
+// ===== INDESTRUCTIBLE LOADING CIRCLE =====
+(function() {
+    // ရှိပြီးသား circle ဖျောက်
+    const oldCircle = document.getElementById('loading-circle');
+    if (oldCircle) oldCircle.remove();
+    
+    // အသစ်ဖန်တီး
+    const newCircle = document.createElement('div');
+    newCircle.id = 'loading-circle';
+    
+    // နေရာအသေချုပ် - တစ်ခုတည်းသောနေရာ
+    Object.assign(newCircle.style, {
+        position: 'fixed',
+        bottom: '30px',
+        left: '50%',
+        width: '60px',
+        height: '60px',
+        border: '6px solid rgba(33, 150, 243, 0.3)',
+        borderTop: '6px solid #2196F3',
+        borderRadius: '50%',
+        zIndex: '99999',
+        pointerEvents: 'none',
+        boxSizing: 'border-box'
+    });
+    
+    // Container ထဲထည့်
+    document.body.appendChild(newCircle);
+    
+    // ကိုယ်ပိုင်လှည့်
+    let angle = 0;
+    function rotate() {
+        angle += 4;
+        if (angle >= 360) angle = 0;
+        
+        // transform ကိုတိုက်ရိုက်ထည့်
+        newCircle.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+        requestAnimationFrame(rotate);
+    }
+    rotate();
+    
+    // ===== INDESTRUCTIBLE LOCK =====
+    // MutationObserver - style ပြောင်းတိုင်းပြန်ပြင်
+    const styleObserver = new MutationObserver(() => {
+        // Position ပြန်ချုပ်
+        Object.assign(newCircle.style, {
+            position: 'fixed',
+            bottom: '30px',
+            left: '50%',
+            transform: `translateX(-50%) rotate(${angle}deg)`
+        });
+    });
+    
+    // Observer စ
+    styleObserver.observe(newCircle, {
+        attributes: true,
+        attributeFilter: ['style']
+    });
+    
+    // အဆက်မပြတ်စစ်
+    const guardian = setInterval(() => {
+        // Position မှန်မှန်ရှိရဲ့လား
+        const rect = newCircle.getBoundingClientRect();
+        const shouldBottom = window.innerHeight - 30 - rect.height;
+        
+        if (Math.abs(rect.bottom - window.innerHeight + 30) > 2) {
+            newCircle.style.bottom = '30px';
+            newCircle.style.top = 'auto';
+        }
+        
+        if (Math.abs(rect.left + rect.width/2 - window.innerWidth/2) > 2) {
+            newCircle.style.left = '50%';
+            newCircle.style.right = 'auto';
+        }
+        
+        // ကိုယ်ပိုင် element ဖြစ်ရဲ့လား
+        if (!document.body.contains(newCircle)) {
+            document.body.appendChild(newCircle);
+        }
+    }, 100);
+    
+    // ===== 3-SECOND ENTER BUTTON =====
+    setTimeout(() => {
+        // Circle ဖျောက်
+        newCircle.style.display = 'none';
+        
+        // Enter button
+        const enterBtn = document.getElementById('enter-btn');
+        if (enterBtn) {
+            enterBtn.style.display = 'block';
+            enterBtn.classList.add('show');
+            
+            // Click event
+            enterBtn.onclick = () => {
+                const loadingScreen = document.getElementById('loading-screen');
+                const gameContainer = document.getElementById('game-container');
+                
+                if (loadingScreen) loadingScreen.style.display = 'none';
+                if (gameContainer) gameContainer.style.display = 'block';
+                
+                // Cleanup
+                clearInterval(guardian);
+                styleObserver.disconnect();
+                if (newCircle.parentNode) newCircle.remove();
+                
+                // Music & resources
+                const bgMusic = document.getElementById('bg-music');
+                if (bgMusic) {
+                    bgMusic.volume = 0.6;
+                    bgMusic.play();
+                }
+                
+                if (typeof initializeUserResources === 'function') {
+                    initializeUserResources();
+                }
+            };
+        }
+    }, 3000);
+    
+    console.log('🔒 Indestructible circle created');
+})();
+
+// Profile Circle Size Lock
+setInterval(() => {
+    const circle = document.getElementById('profile-circle');
+    if (circle) {
+        circle.style.width = '80px';
+        circle.style.height = '80px';
+    }
+}, 500);
 
 </script>
 </body>
