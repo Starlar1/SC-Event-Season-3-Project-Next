@@ -1428,7 +1428,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// ===== Server 3 ကို ပြင်ဆင်ထားသော ကုဒ် =====
+// Supabase 4 Servers
 const SUPABASE_SERVERS = [
     {
         id: 1,
@@ -1439,13 +1439,13 @@ const SUPABASE_SERVERS = [
     {
         id: 2,
         url: "https://ryvpgilgbslkugpbjjkt.supabase.co",
-        key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXAhYmFzZSIsInJlZiI6InJ5dnBnaWxnYnNsa3VncGJqamt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMjg1MTUsImV4cCI6MjA4MTYwNDUxNX0.vE387j8txP8rOMQRQmGdJlQH4IgVOB7jO09HV5SSRVA",
+        key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5dnBnaWxnYnNsa3VncGJqamt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMjg1MTUsImV4cCI6MjA4MTYwNDUxNX0.vE387j8txP8rOMQRQmGdJlQH4IgVOB7jO09HV5SSRVA",
         maxUsers: 100
     },
     {
         id: 3,
         url: "https://wfwirpmhbkqfsocfoqsq.supabase.co",
-        key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indmd2lycG1oYmtxZnNvY2ZvcXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMjg3NjIsImV4cCI6MjA4MTYwNDc2Mn0.GEb_HB9WXOqtSWOm5Tau6A1fUr8ELX0asrvQOAaPByU",
+        key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indmd2lycG1oYmtxZnNvY2ZvcXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMjg3NjIsImV4cCI6MjA4MTYwNDc2Yn0.GEb_HB9WXOqtSWOm5Tau6A1fUr8ELX0asrvQOAaPByU",
         maxUsers: 100
     },
     {
@@ -1455,7 +1455,7 @@ const SUPABASE_SERVERS = [
         maxUsers: 100
     }
 ];
-    
+
 // Generate 10-digit User ID
 function generateUserID() {
     const timestamp = Date.now().toString().slice(-6);
